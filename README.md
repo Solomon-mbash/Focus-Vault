@@ -1,6 +1,5 @@
 # FOCUS VAULT &bull; Discipline Execution Engine
 
-> **"only i want is: discipline & focus. And Not more information."**
 
 FOCUS VAULT is a full-stack, single-page discipline execution prison inspired by Obsidian + Linear design aesthetics. Built for high-performance engineers, traders, and founders who prioritize brutal execution over information overload.
 
