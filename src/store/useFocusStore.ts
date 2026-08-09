@@ -15,8 +15,10 @@ import {
 import { playTaskDoneSound, playTimerCompletionSound } from '@/lib/sound';
 
 interface FocusState {
-  // Navigation active tab
+  // Navigation active tab & Theme mode
   activeTab: 'board' | 'journal' | 'later';
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
 
   // Tasks
   tasks: Task[];
@@ -88,6 +90,8 @@ export const useFocusStore = create<FocusState>()(
   persist(
     (set, get) => ({
       activeTab: 'board',
+      theme: 'dark',
+      toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
 
       tasks: [],
       dayLogs: {},

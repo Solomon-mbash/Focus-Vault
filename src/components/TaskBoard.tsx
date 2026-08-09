@@ -30,6 +30,7 @@ export const TaskBoard: React.FC = () => {
   const {
     tasks,
     dayLogs,
+    theme,
     addTask,
     startTask,
     completeTask,
@@ -38,6 +39,7 @@ export const TaskBoard: React.FC = () => {
     carryOverUnfinishedTasks,
   } = useFocusStore();
 
+  const isLight = theme === 'light';
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
   const streak = useStreakCount(dayLogs);
@@ -105,26 +107,36 @@ export const TaskBoard: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111111] border border-neutral-800 p-5 rounded-xl shadow-xl">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-4 p-5 rounded-xl border transition-all ${
+          isLight
+            ? 'bg-white border-slate-200 shadow-xl shadow-slate-200/50 text-slate-800'
+            : 'bg-[#111111] border-neutral-800 shadow-xl text-white'
+        }`}
+      >
         <div>
-          <div className="text-xs font-mono text-neutral-400 uppercase tracking-widest">
+          <div className={`text-xs font-mono uppercase tracking-widest ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
             {format(new Date(), 'EEEE')} &bull; {format(new Date(), 'MMMM d, yyyy')}
           </div>
-          <h2 className="text-2xl font-black font-mono tracking-tight text-white mt-0.5 flex items-center space-x-2">
+          <h2 className="text-2xl font-black font-mono tracking-tight mt-0.5 flex items-center space-x-2">
             <span>DAILY EXECUTION BOARD</span>
           </h2>
         </div>
 
         <div className="flex items-center space-x-4">
           {/* Streak Counter */}
-          <div className="flex items-center space-x-2.5 bg-neutral-950 px-4 py-2 rounded-lg border border-neutral-800 shadow-inner">
-            <Flame className="w-5 h-5 text-red-500 fill-red-500/20 animate-pulse" />
+          <div
+            className={`flex items-center space-x-2.5 px-4 py-2 rounded-lg border shadow-inner ${
+              isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800'
+            }`}
+          >
+            <Flame className={`w-5 h-5 animate-pulse ${isLight ? 'text-[#4946FF] fill-[#4946FF]/20' : 'text-red-500 fill-red-500/20'}`} />
             <div>
-              <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
+              <div className={`text-[10px] font-mono uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
                 DISCIPLINE STREAK
               </div>
-              <div className="text-base font-extrabold font-mono text-red-400 leading-none">
-                {streak} DAYS <span className="text-xs text-neutral-500 font-normal">(&ge;80%)</span>
+              <div className={`text-base font-extrabold font-mono leading-none ${isLight ? 'text-[#4946FF]' : 'text-red-400'}`}>
+                {streak} DAYS <span className={`text-xs font-normal ${isLight ? 'text-slate-400' : 'text-neutral-500'}`}>(&ge;80%)</span>
               </div>
             </div>
           </div>
@@ -132,7 +144,11 @@ export const TaskBoard: React.FC = () => {
           {/* Add Task Button */}
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold font-mono uppercase tracking-wider rounded-lg flex items-center space-x-2 shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all cursor-pointer"
+            className={`px-4 py-2.5 text-white text-xs font-bold font-mono uppercase tracking-wider rounded-lg flex items-center space-x-2 transition-all cursor-pointer ${
+              isLight
+                ? 'bg-[#4946FF] hover:bg-[#3B38EC] shadow-md shadow-[#4946FF]/30'
+                : 'bg-red-600 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+            }`}
           >
             <Plus className="w-4 h-4" />
             <span>ADD TODAY TARGET</span>
@@ -145,19 +161,23 @@ export const TaskBoard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-950/70 border-2 border-amber-500/80 p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-xl"
+          className={`p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-xl border-2 ${
+            isLight
+              ? 'bg-amber-50 border-amber-300 text-amber-900'
+              : 'bg-amber-950/70 border-amber-500/80 text-amber-200'
+          }`}
         >
-          <div className="flex items-center space-x-3 text-amber-200 font-mono text-xs md:text-sm">
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 animate-bounce" />
+          <div className="flex items-center space-x-3 font-mono text-xs md:text-sm">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 animate-bounce" />
             <div>
-              <span className="font-bold text-amber-400 uppercase">UNFINISHED PAST TARGETS DETECTED:</span>{' '}
-              You have <span className="underline font-bold text-white bg-amber-900 px-2 py-0.5 rounded">{unfinishedPastTasks.length} unfinished tasks</span> from previous days.
+              <span className="font-bold uppercase text-amber-600">UNFINISHED PAST TARGETS DETECTED:</span>{' '}
+              You have <span className={`underline font-bold px-2 py-0.5 rounded ${isLight ? 'bg-amber-200 text-amber-900' : 'bg-amber-900 text-white'}`}>{unfinishedPastTasks.length} unfinished tasks</span> from previous days.
             </div>
           </div>
 
           <button
             onClick={carryOverUnfinishedTasks}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-mono font-bold uppercase rounded-lg flex items-center space-x-1.5 shadow-[0_0_12px_rgba(245,158,11,0.4)] transition-all cursor-pointer shrink-0"
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-mono font-bold uppercase rounded-lg flex items-center space-x-1.5 shadow-md transition-all cursor-pointer shrink-0"
           >
             <ArrowRightLeft className="w-4 h-4" />
             <span>CARRY OVER TO TODAY</span>
@@ -166,18 +186,30 @@ export const TaskBoard: React.FC = () => {
       )}
 
       {/* Date View Filters Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111111] border border-neutral-800/80 p-3 rounded-xl">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border ${
+          isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#111111] border-neutral-800/80'
+        }`}
+      >
         <div className="flex items-center space-x-2 font-mono text-xs">
-          <Calendar className="w-4 h-4 text-neutral-400" />
-          <span className="text-neutral-400 font-bold uppercase">VIEW TARGETS:</span>
+          <Calendar className={`w-4 h-4 ${isLight ? 'text-[#4946FF]' : 'text-neutral-400'}`} />
+          <span className={`font-bold uppercase ${isLight ? 'text-slate-700' : 'text-neutral-400'}`}>VIEW TARGETS:</span>
         </div>
 
-        <div className="flex items-center space-x-1.5 bg-neutral-950 p-1 rounded-lg border border-neutral-800">
+        <div
+          className={`flex items-center space-x-1.5 p-1 rounded-lg border ${
+            isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800'
+          }`}
+        >
           <button
             onClick={() => setViewDateMode('today')}
             className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer ${
               viewDateMode === 'today'
-                ? 'bg-red-600 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]'
+                ? isLight
+                  ? 'bg-[#4946FF] text-white shadow-md'
+                  : 'bg-red-600 text-white shadow-[0_0_10px_rgba(239,68,68,0.4)]'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -188,7 +220,9 @@ export const TaskBoard: React.FC = () => {
             onClick={() => setViewDateMode('yesterday')}
             className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer ${
               viewDateMode === 'yesterday'
-                ? 'bg-amber-600 text-white shadow-[0_0_10px_rgba(245,158,11,0.4)]'
+                ? 'bg-amber-600 text-white shadow-md'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -199,7 +233,11 @@ export const TaskBoard: React.FC = () => {
             onClick={() => setViewDateMode('all')}
             className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer ${
               viewDateMode === 'all'
-                ? 'bg-neutral-700 text-white shadow'
+                ? isLight
+                  ? 'bg-slate-700 text-white'
+                  : 'bg-neutral-700 text-white'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -210,18 +248,22 @@ export const TaskBoard: React.FC = () => {
 
       {/* Task List */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs font-mono text-neutral-400 px-1">
-          <span className="font-bold text-neutral-300">
+        <div className={`flex items-center justify-between text-xs font-mono px-1 ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
+          <span className={`font-bold ${isLight ? 'text-slate-700' : 'text-neutral-300'}`}>
             {viewDateMode === 'today' ? "TODAY'S TARGETS" : viewDateMode === 'yesterday' ? "YESTERDAY'S TARGETS" : "ALL HISTORICAL TARGETS"} ({sortedTasks.length})
           </span>
-          <span className="text-neutral-500">SORT: P1 MUST &gt; P2 SHOULD &gt; P3 NICE</span>
+          <span className={isLight ? 'text-slate-400' : 'text-neutral-500'}>SORT: P1 MUST &gt; P2 SHOULD &gt; P3 NICE</span>
         </div>
 
         {sortedTasks.length === 0 ? (
-          <div className="p-12 text-center bg-[#111111]/60 border border-dashed border-neutral-800 rounded-xl">
-            <Target className="w-10 h-10 text-neutral-600 mx-auto mb-3" />
-            <div className="text-neutral-200 font-mono font-bold text-base">NO TARGETS IN THIS VIEW</div>
-            <p className="text-neutral-500 text-xs mt-1 max-w-sm mx-auto">
+          <div
+            className={`p-12 text-center border border-dashed rounded-xl ${
+              isLight ? 'bg-white border-slate-300 text-slate-600' : 'bg-[#111111]/60 border-neutral-800 text-neutral-200'
+            }`}
+          >
+            <Target className={`w-10 h-10 mx-auto mb-3 ${isLight ? 'text-slate-400' : 'text-neutral-600'}`} />
+            <div className="font-mono font-bold text-base">NO TARGETS IN THIS VIEW</div>
+            <p className={`text-xs mt-1 max-w-sm mx-auto ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
               {viewDateMode === 'today'
                 ? 'Execution starts with clear intent. Click "ADD TODAY TARGET" to set your focus targets.'
                 : 'No targets recorded for this date view.'}
@@ -245,11 +287,19 @@ export const TaskBoard: React.FC = () => {
                   exit={{ opacity: 0 }}
                   className={`p-4 rounded-xl border transition-all flex flex-wrap items-center justify-between gap-4 cursor-pointer ${
                     isDoing
-                      ? 'bg-[#141414] border-red-500/90 shadow-[0_0_20px_rgba(239,68,68,0.2)] ring-1 ring-red-500/60'
+                      ? isLight
+                        ? 'bg-indigo-50/90 border-[#4946FF] shadow-lg shadow-[#4946FF]/10 ring-1 ring-[#4946FF]/50'
+                        : 'bg-[#141414] border-red-500/90 shadow-[0_0_20px_rgba(239,68,68,0.2)] ring-1 ring-red-500/60'
                       : isDone
-                      ? 'bg-neutral-950/70 border-neutral-800/80 opacity-70'
+                      ? isLight
+                        ? 'bg-slate-50 border-slate-200 opacity-75'
+                        : 'bg-neutral-950/70 border-neutral-800/80 opacity-70'
                       : isFailed
-                      ? 'bg-neutral-950/40 border-neutral-900 opacity-50 line-through'
+                      ? isLight
+                        ? 'bg-slate-100 border-slate-200 opacity-50 line-through'
+                        : 'bg-neutral-950/40 border-neutral-900 opacity-50 line-through'
+                      : isLight
+                      ? 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/80 shadow-sm'
                       : 'bg-[#111111] border-neutral-800 hover:border-neutral-700 hover:bg-[#151515]'
                   }`}
                 >
@@ -258,9 +308,11 @@ export const TaskBoard: React.FC = () => {
                     <div
                       className={`px-2.5 py-1 text-xs font-mono font-bold rounded-md shrink-0 shadow-sm ${
                         isP1
-                          ? 'bg-red-950/90 text-red-400 border border-red-800'
+                          ? 'bg-red-500/10 text-red-600 border border-red-500/30'
                           : isP2
-                          ? 'bg-amber-950/90 text-amber-400 border border-amber-800'
+                          ? 'bg-amber-500/10 text-amber-600 border border-amber-500/30'
+                          : isLight
+                          ? 'bg-slate-200 text-slate-700 border border-slate-300'
                           : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
                       }`}
                     >
@@ -268,24 +320,30 @@ export const TaskBoard: React.FC = () => {
                     </div>
 
                     {/* Category Pill */}
-                    <div className="p-1.5 bg-neutral-950 border border-neutral-800 rounded-md shrink-0 text-neutral-400 flex items-center space-x-1">
-                      {task.category === 'CODE' && <Code className="w-3.5 h-3.5 text-blue-400" />}
-                      {task.category === 'TRADE' && <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />}
-                      {task.category === 'LIFE' && <Heart className="w-3.5 h-3.5 text-pink-400" />}
-                      <span className="text-[10px] font-mono text-neutral-500 font-bold uppercase hidden sm:inline">
+                    <div
+                      className={`p-1.5 rounded-md shrink-0 border flex items-center space-x-1 ${
+                        isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+                      }`}
+                    >
+                      {task.category === 'CODE' && <Code className="w-3.5 h-3.5 text-blue-500" />}
+                      {task.category === 'TRADE' && <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />}
+                      {task.category === 'LIFE' && <Heart className="w-3.5 h-3.5 text-pink-500" />}
+                      <span className={`text-[10px] font-mono font-bold uppercase hidden sm:inline ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
                         {task.category}
                       </span>
                     </div>
 
                     {/* Details */}
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm md:text-base font-semibold text-white">
+                      <div className="text-sm md:text-base font-semibold">
                         <span
                           className={
                             isDone
-                              ? 'line-through text-neutral-500'
+                              ? 'line-through text-slate-400'
                               : isFailed
-                              ? 'line-through text-neutral-600'
+                              ? 'line-through text-slate-400'
+                              : isLight
+                              ? 'text-slate-900'
                               : 'text-neutral-100'
                           }
                         >
@@ -293,22 +351,22 @@ export const TaskBoard: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center space-x-3 text-xs font-mono text-neutral-400 mt-1">
+                      <div className={`flex items-center space-x-3 text-xs font-mono mt-1 ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
                         <span className="flex items-center space-x-1">
-                          <Clock className="w-3 h-3 text-neutral-500" />
+                          <Clock className={`w-3 h-3 ${isLight ? 'text-slate-400' : 'text-neutral-500'}`} />
                           <span>Est: {task.estTime}m</span>
                         </span>
-                        <span className="text-neutral-500 font-bold">
+                        <span className={`font-bold ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
                           Date: {task.dateStr}
                         </span>
                         {task.actualTime && (
-                          <span className="text-emerald-400 font-bold">
+                          <span className="text-emerald-600 font-bold">
                             Logged: {task.actualTime}m
                           </span>
                         )}
                         {task.focusScore && (
-                          <span className="text-amber-400 font-bold flex items-center space-x-0.5">
-                            <Zap className="w-3 h-3 fill-amber-400" />
+                          <span className="text-amber-500 font-bold flex items-center space-x-0.5">
+                            <Zap className="w-3 h-3 fill-amber-500" />
                             <span>Score: {task.focusScore}</span>
                           </span>
                         )}
@@ -321,7 +379,11 @@ export const TaskBoard: React.FC = () => {
                     {task.status === 'todo' && (
                       <button
                         onClick={() => startTask(task.id)}
-                        className="px-3.5 py-1.5 bg-neutral-800 hover:bg-red-900/60 text-neutral-200 hover:text-white border border-neutral-700 hover:border-red-600 text-xs font-mono font-bold rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
+                        className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer border ${
+                          isLight
+                            ? 'bg-[#4946FF]/10 hover:bg-[#4946FF]/20 text-[#4946FF] border-[#4946FF]/30'
+                            : 'bg-neutral-800 hover:bg-red-900/60 text-neutral-200 hover:text-white border-neutral-700 hover:border-red-600'
+                        }`}
                       >
                         <Play className="w-3.5 h-3.5" />
                         <span>FOCUS NOW</span>
@@ -334,7 +396,7 @@ export const TaskBoard: React.FC = () => {
                           setCompletingTask(task);
                           setActualTimeInput(task.estTime);
                         }}
-                        className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-lg flex items-center space-x-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-colors cursor-pointer"
+                        className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-lg flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-colors cursor-pointer"
                       >
                         <Check className="w-4 h-4" />
                         <span>MARK DONE</span>
@@ -345,7 +407,9 @@ export const TaskBoard: React.FC = () => {
                       <button
                         onClick={() => failTask(task.id)}
                         title="Mark Failed"
-                        className="p-1.5 text-neutral-500 hover:text-red-400 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                        className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                          isLight ? 'text-slate-400 hover:text-red-600 hover:bg-slate-100' : 'text-neutral-500 hover:text-red-400 hover:bg-neutral-800'
+                        }`}
                       >
                         <XCircle className="w-4 h-4" />
                       </button>
@@ -354,7 +418,9 @@ export const TaskBoard: React.FC = () => {
                     <button
                       onClick={() => deleteTask(task.id)}
                       title="Delete Task"
-                      className="p-1.5 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                        isLight ? 'text-slate-400 hover:text-slate-700 hover:bg-slate-100' : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800'
+                      }`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -367,22 +433,28 @@ export const TaskBoard: React.FC = () => {
       </div>
 
       {/* Bottom Summary Bar */}
-      <div className="bg-[#111111] border border-neutral-800 p-5 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        className={`p-5 rounded-xl border grid grid-cols-1 md:grid-cols-2 gap-4 ${
+          isLight ? 'bg-white border-slate-200 shadow-sm text-slate-800' : 'bg-[#111111] border-neutral-800 shadow-xl text-white'
+        }`}
+      >
         {/* Progress Bar */}
         <div>
           <div className="flex items-center justify-between text-xs font-mono mb-2">
-            <span className="text-neutral-400 font-bold">TODAY TARGET COMPLETION RATE</span>
-            <span className="font-bold text-white font-mono">
+            <span className={`font-bold ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>TODAY TARGET COMPLETION RATE</span>
+            <span className="font-bold font-mono">
               {doneCount} / {totalCount} ({progressPercent}%)
             </span>
           </div>
-          <div className="w-full h-3 bg-neutral-950 rounded-full overflow-hidden border border-neutral-800">
+          <div className={`w-full h-3 rounded-full overflow-hidden border ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800'}`}>
             <div
               className={`h-full transition-all duration-500 shadow-sm ${
                 progressPercent >= 80
                   ? 'bg-emerald-500'
                   : progressPercent >= 50
                   ? 'bg-amber-500'
+                  : isLight
+                  ? 'bg-[#4946FF]'
                   : 'bg-red-600'
               }`}
               style={{ width: `${progressPercent}%` }}
@@ -391,24 +463,32 @@ export const TaskBoard: React.FC = () => {
         </div>
 
         {/* Deep Work Hours */}
-        <div className="flex items-center justify-between bg-neutral-950 border border-neutral-800 p-3 rounded-lg">
+        <div
+          className={`flex items-center justify-between p-3 rounded-lg border ${
+            isLight ? 'bg-slate-50 border-slate-200' : 'bg-neutral-950 border-neutral-800'
+          }`}
+        >
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded-md text-amber-400">
-              <Zap className="w-5 h-5 fill-amber-400/20" />
+            <div
+              className={`p-2 rounded-md border ${
+                isLight ? 'bg-[#4946FF]/10 border-[#4946FF]/30 text-[#4946FF]' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+              }`}
+            >
+              <Zap className="w-5 h-5 fill-current" />
             </div>
             <div>
-              <div className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
+              <div className={`text-[10px] font-mono uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
                 DEEP WORK LOGGED TODAY
               </div>
-              <div className="text-lg font-bold font-mono text-white">
-                {deepWorkHours} <span className="text-xs text-neutral-400 font-normal">HOURS</span>
+              <div className="text-lg font-bold font-mono">
+                {deepWorkHours} <span className={`text-xs font-normal ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>HOURS</span>
               </div>
             </div>
           </div>
 
-          <div className="text-right font-mono text-[11px] text-neutral-500">
-            <div className="font-bold text-neutral-400">HIGH INTENSITY WORK</div>
-            <div className="text-red-400 font-bold">NO MULTITASKING</div>
+          <div className={`text-right font-mono text-[11px] ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
+            <div className="font-bold">HIGH INTENSITY WORK</div>
+            <div className={`font-bold ${isLight ? 'text-[#4946FF]' : 'text-red-400'}`}>NO MULTITASKING</div>
           </div>
         </div>
       </div>
@@ -416,21 +496,23 @@ export const TaskBoard: React.FC = () => {
       {/* Add Task Modal */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#111111] border border-neutral-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4"
+              className={`rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 border ${
+                isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
+              }`}
             >
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <h3 className="text-lg font-mono font-bold text-white flex items-center space-x-2">
-                  <Plus className="w-5 h-5 text-red-500" />
+              <div className={`flex items-center justify-between border-b pb-3 ${isLight ? 'border-slate-200' : 'border-neutral-800'}`}>
+                <h3 className="text-lg font-mono font-bold flex items-center space-x-2">
+                  <Plus className={`w-5 h-5 ${isLight ? 'text-[#4946FF]' : 'text-red-500'}`} />
                   <span>ADD TODAY EXECUTION TARGET</span>
                 </h3>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className="text-neutral-500 hover:text-white text-sm"
+                  className={`text-sm ${isLight ? 'text-slate-400 hover:text-slate-700' : 'text-neutral-500 hover:text-white'}`}
                 >
                   ✕
                 </button>
@@ -438,24 +520,32 @@ export const TaskBoard: React.FC = () => {
 
               <form onSubmit={handleCreateTask} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">TASK TITLE</label>
+                  <label className={`block text-xs font-mono mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>TASK TITLE</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Build SMC Trade Scanner Module"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-red-500 font-sans"
+                    className={`w-full rounded-lg px-3.5 py-2.5 text-sm font-sans focus:outline-none border ${
+                      isLight
+                        ? 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-[#4946FF]'
+                        : 'bg-neutral-950 border-neutral-800 text-white placeholder-neutral-600 focus:border-red-500'
+                    }`}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-mono text-neutral-400 mb-1">PRIORITY</label>
+                    <label className={`block text-xs font-mono mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>PRIORITY</label>
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value as Priority)}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500 font-mono"
+                      className={`w-full rounded-lg px-3 py-2 text-sm font-mono focus:outline-none border ${
+                        isLight
+                          ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-[#4946FF]'
+                          : 'bg-neutral-950 border-neutral-800 text-white focus:border-red-500'
+                      }`}
                     >
                       <option value="P1">P1 (Red - Must)</option>
                       <option value="P2">P2 (Yellow - Should)</option>
@@ -464,11 +554,15 @@ export const TaskBoard: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-mono text-neutral-400 mb-1">CATEGORY</label>
+                    <label className={`block text-xs font-mono mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>CATEGORY</label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as TaskCategory)}
-                      className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-red-500 font-mono"
+                      className={`w-full rounded-lg px-3 py-2 text-sm font-mono focus:outline-none border ${
+                        isLight
+                          ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-[#4946FF]'
+                          : 'bg-neutral-950 border-neutral-800 text-white focus:border-red-500'
+                      }`}
                     >
                       <option value="CODE">CODE</option>
                       <option value="TRADE">TRADE</option>
@@ -478,7 +572,7 @@ export const TaskBoard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">ESTIMATED TIME</label>
+                  <label className={`block text-xs font-mono mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>ESTIMATED TIME</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[15, 30, 60, 90].map((mins) => (
                       <button
@@ -487,7 +581,11 @@ export const TaskBoard: React.FC = () => {
                         onClick={() => setEstTime(mins)}
                         className={`py-2 text-xs font-mono font-bold rounded-lg border transition-all ${
                           estTime === mins
-                            ? 'bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]'
+                            ? isLight
+                              ? 'bg-[#4946FF] text-white border-[#4946FF] shadow-md shadow-[#4946FF]/30'
+                              : 'bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]'
+                            : isLight
+                            ? 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                             : 'bg-neutral-950 text-neutral-400 border-neutral-800 hover:text-white'
                         }`}
                       >
@@ -497,17 +595,21 @@ export const TaskBoard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-end space-x-3 border-t border-neutral-800/80">
+                <div className={`pt-2 flex justify-end space-x-3 border-t ${isLight ? 'border-slate-200' : 'border-neutral-800/80'}`}>
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white rounded-lg text-xs font-mono"
+                    className={`px-4 py-2 rounded-lg text-xs font-mono border ${
+                      isLight ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                    }`}
                   >
                     CANCEL
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider shadow-lg"
+                    className={`px-5 py-2 text-white rounded-lg text-xs font-mono font-bold uppercase tracking-wider shadow-lg ${
+                      isLight ? 'bg-[#4946FF] hover:bg-[#3B38EC]' : 'bg-red-600 hover:bg-red-500'
+                    }`}
                   >
                     ADD TARGET
                   </button>
@@ -521,32 +623,34 @@ export const TaskBoard: React.FC = () => {
       {/* Log Done Modal */}
       <AnimatePresence>
         {completingTask && (
-          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#111111] border border-neutral-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4"
+              className={`rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 border ${
+                isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
+              }`}
             >
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <h3 className="text-lg font-mono font-bold text-emerald-400 flex items-center space-x-2">
+              <div className={`flex items-center justify-between border-b pb-3 ${isLight ? 'border-slate-200' : 'border-neutral-800'}`}>
+                <h3 className="text-lg font-mono font-bold text-emerald-600 flex items-center space-x-2">
                   <CheckCircle2 className="w-5 h-5" />
                   <span>LOG TASK COMPLETION</span>
                 </h3>
                 <button
                   onClick={() => setCompletingTask(null)}
-                  className="text-neutral-500 hover:text-white text-sm"
+                  className={`text-sm ${isLight ? 'text-slate-400 hover:text-slate-700' : 'text-neutral-500 hover:text-white'}`}
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold">
                 "{completingTask.title}"
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-neutral-400 mb-1">
+                <label className={`block text-xs font-mono mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>
                   ACTUAL TIME SPENT (MINUTES)
                 </label>
                 <input
@@ -555,14 +659,20 @@ export const TaskBoard: React.FC = () => {
                   max="480"
                   value={actualTimeInput}
                   onChange={(e) => setActualTimeInput(Number(e.target.value))}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-emerald-500"
+                  className={`w-full rounded-lg px-3 py-2 text-sm font-mono focus:outline-none border ${
+                    isLight
+                      ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-500'
+                      : 'bg-neutral-950 border-neutral-800 text-white focus:border-emerald-500'
+                  }`}
                 />
               </div>
 
-              <div className="p-3 bg-neutral-950 border border-neutral-800 rounded-lg text-xs font-mono space-y-1 text-neutral-400">
+              <div className={`p-3 rounded-lg text-xs font-mono space-y-1 border ${
+                isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+              }`}>
                 <div className="flex justify-between">
                   <span>Priority Multiplier:</span>
-                  <span className="text-white font-bold">
+                  <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
                     {completingTask.priority === 'P1'
                       ? '1.5x (P1 Must)'
                       : completingTask.priority === 'P2'
@@ -570,7 +680,7 @@ export const TaskBoard: React.FC = () => {
                       : '1.0x (P3 Nice)'}
                   </span>
                 </div>
-                <div className="flex justify-between text-amber-400 font-bold">
+                <div className="flex justify-between text-amber-500 font-bold">
                   <span>Calculated Focus Score:</span>
                   <span>
                     {Math.round(
@@ -588,7 +698,9 @@ export const TaskBoard: React.FC = () => {
               <div className="flex justify-end space-x-3 pt-2">
                 <button
                   onClick={() => setCompletingTask(null)}
-                  className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-white rounded-lg text-xs font-mono"
+                  className={`px-4 py-2 rounded-lg text-xs font-mono border ${
+                    isLight ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                  }`}
                 >
                   CANCEL
                 </button>

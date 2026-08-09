@@ -13,8 +13,9 @@ import { LaterList } from '@/components/LaterList';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
-  const { activeTab, fetchDatabaseData } = useFocusStore();
+  const { activeTab, theme, fetchDatabaseData } = useFocusStore();
   const [isHydrated, setIsHydrated] = useState(false);
+  const isLight = theme === 'light';
 
   // Hydration & SQLite Database Sync on mount
   useEffect(() => {
@@ -34,7 +35,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-[#E5E5E5] font-sans flex flex-col selection:bg-red-900 selection:text-white">
+    <main
+      className={`min-h-screen font-sans flex flex-col transition-colors duration-300 ${
+        isLight
+          ? 'bg-[#F8FAFC] text-[#0F172A] selection:bg-[#4946FF] selection:text-white'
+          : 'bg-[#0A0A0A] text-[#E5E5E5] selection:bg-red-900 selection:text-white'
+      }`}
+    >
       {/* FEATURE 4: MOTIVATION WALL (Top 30% of screen, shows on EVERY open) */}
       <MotivationWall />
 
@@ -93,10 +100,16 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      {/* Obsidian Minimal Footer */}
-      <footer className="w-full border-t border-neutral-900 bg-neutral-950 py-6 text-center text-xs font-mono text-neutral-600">
+      {/* Footer */}
+      <footer
+        className={`w-full py-6 text-center text-xs font-mono border-t transition-colors ${
+          isLight
+            ? 'bg-white border-slate-200 text-slate-500'
+            : 'bg-neutral-950 border-neutral-900 text-neutral-600'
+        }`}
+      >
         <div>FOCUS VAULT &bull; SINGLE PURPOSE EXECUTION ENGINE</div>
-        <div className="mt-1 text-[10px] text-neutral-700">
+        <div className={`mt-1 text-[10px] ${isLight ? 'text-slate-400' : 'text-neutral-700'}`}>
           "only i want is: discipline & focus. And Not more information."
         </div>
       </footer>
