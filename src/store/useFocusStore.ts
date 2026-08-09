@@ -16,7 +16,7 @@ import { playTaskDoneSound, playTimerCompletionSound } from '@/lib/sound';
 
 interface FocusState {
   // Navigation active tab
-  activeTab: 'board' | 'vision' | 'journal' | 'later';
+  activeTab: 'board' | 'journal' | 'later';
 
   // Tasks
   tasks: Task[];
@@ -63,7 +63,7 @@ interface FocusState {
   skipBreak: () => void;
   tickPomodoro: () => void;
   setSoundEnabled: (enabled: boolean) => void;
-  setActiveTab: (tab: 'board' | 'vision' | 'journal' | 'later') => void;
+  setActiveTab: (tab: 'board' | 'journal' | 'later') => void;
 
   // Database Persistence Methods
   fetchDatabaseData: () => Promise<void>;

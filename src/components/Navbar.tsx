@@ -6,7 +6,6 @@ import { BackupModal } from '@/components/BackupModal';
 import {
   Flame,
   LayoutDashboard,
-  Crosshair,
   TrendingUp,
   Lightbulb,
   RotateCcw,
@@ -56,18 +55,6 @@ export const Navbar: React.FC = () => {
             >
               <LayoutDashboard className="w-3.5 h-3.5 text-red-500" />
               <span>EXECUTION BOARD</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('vision')}
-              className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all cursor-pointer ${
-                activeTab === 'vision'
-                  ? 'bg-neutral-800 text-white font-bold border border-neutral-700 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/60'
-              }`}
-            >
-              <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-              <span>VISION FORCEFIELD</span>
             </button>
 
             <button
@@ -132,16 +119,6 @@ export const Navbar: React.FC = () => {
             }`}
           >
             BOARD
-          </button>
-          <button
-            onClick={() => setActiveTab('vision')}
-            className={`flex-1 py-2.5 px-2 text-center whitespace-nowrap border-b-2 cursor-pointer ${
-              activeTab === 'vision'
-                ? 'border-amber-500 text-white font-bold bg-[#111111]'
-                : 'border-transparent text-neutral-400'
-            }`}
-          >
-            FORCEFIELD
           </button>
           <button
             onClick={() => setActiveTab('journal')}

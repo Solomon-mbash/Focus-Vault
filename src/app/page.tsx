@@ -9,7 +9,6 @@ import { TaskBoard } from '@/components/TaskBoard';
 import { DailyReflectionSection } from '@/components/DailyReflectionSection';
 import { FocusFormulaSection } from '@/components/FocusFormulaSection';
 import { TradeJournal } from '@/components/TradeJournal';
-import { VisionForcefield } from '@/components/VisionForcefield';
 import { LaterList } from '@/components/LaterList';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -65,18 +64,6 @@ export default function Home() {
 
               {/* Focus Formula & Evening Review & 30-Day Heatmap */}
               <FocusFormulaSection />
-            </motion.div>
-          )}
-
-          {activeTab === 'vision' && (
-            <motion.div
-              key="vision"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
-            >
-              <VisionForcefield />
             </motion.div>
           )}
 
