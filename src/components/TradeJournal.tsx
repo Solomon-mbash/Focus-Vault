@@ -21,6 +21,11 @@ import {
   Sparkles,
   FlaskConical,
   Activity,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  ExternalLink,
+  RotateCcw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -49,6 +54,10 @@ export const TradeJournal: React.FC = () => {
 
   // Trade Details & Confluence Preview Modal State
   const [previewTrade, setPreviewTrade] = useState<Trade | null>(null);
+
+  // Fullscreen High-Resolution Lightbox & Zoom State
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [zoomScale, setZoomScale] = useState<number>(1);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,7 +103,7 @@ export const TradeJournal: React.FC = () => {
     return true; // 'ALL'
   });
 
-  // Leak Detector logic (based on filtered trades)
+  // Leak Detector logic
   const mistakeCounts: Record<string, number> = {};
   filteredTrades.forEach((t) => {
     if (t.mistakeTag && t.mistakeTag !== 'None') {
@@ -149,6 +158,33 @@ export const TradeJournal: React.FC = () => {
 
   const chartPath = equityPoints.length > 0 ? `M ${pointsString.replace(/,/g, ' ')}` : `M 0,${chartHeight / 2} L ${chartWidth},${chartHeight / 2}`;
   const fillPath = equityPoints.length > 0 ? `M 0,${chartHeight} L ${pointsString.replace(/,/g, ' ')} L ${chartWidth},${chartHeight} Z` : '';
+
+  const handleOpenLightbox = (imgSrc: string) => {
+    setLightboxImage(imgSrc);
+    setZoomScale(1);
+  };
+
+  const handleZoomIn = () => {
+    setZoomScale((prev) => Math.min(prev + 0.5, 3.5));
+  };
+
+  const handleZoomOut = () => {
+    setZoomScale((prev) => Math.max(prev - 0.5, 0.75));
+  };
+
+  const handleOpenNewTab = (imgSrc: string) => {
+    const win = window.open();
+    if (win) {
+      win.document.write(`
+        <html>
+          <head><title>Full Resolution Chart Screenshot</title></head>
+          <body style="margin:0; background:#0a0a0a; display:flex; justify-content:center; align-items:center; min-height:100vh;">
+            <img src="${imgSrc}" style="max-width:100%; height:auto;" />
+          </body>
+        </html>
+      `);
+    }
+  };
 
   return (
     <div className="w-full space-y-6">
@@ -567,7 +603,7 @@ export const TradeJournal: React.FC = () => {
               </div>
 
               <form onSubmit={handleCreateTrade} className="space-y-4 font-mono text-xs">
-                {/* TRADE TYPE SELECTOR (Real vs Backtest) */}
+                {/* TRADE TYPE SELECTOR */}
                 <div>
                   <label className={`block mb-1.5 font-bold uppercase ${isLight ? 'text-slate-700' : 'text-neutral-300'}`}>
                     TRADE EXECUTION TYPE (MODE)
@@ -851,7 +887,7 @@ export const TradeJournal: React.FC = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className={`rounded-xl p-6 max-w-2xl w-full shadow-2xl space-y-5 my-8 border ${
+              className={`rounded-xl p-6 max-w-3xl w-full shadow-2xl space-y-5 my-8 border ${
                 isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
               }`}
             >
@@ -947,19 +983,58 @@ export const TradeJournal: React.FC = () => {
                 </p>
               </div>
 
-              {/* Chart Screenshot Section */}
+              {/* Enhanced Interactive Chart Screenshot Section with High-Res Lightbox */}
               {previewTrade.screenshot ? (
-                <div className="space-y-1.5">
-                  <div className={`text-xs font-mono font-bold uppercase flex items-center space-x-2 ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
-                    <ImageIcon className="w-4 h-4" />
-                    <span>ENTRY CHART SCREENSHOT</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className={`text-xs font-mono font-bold uppercase flex items-center space-x-2 ${isLight ? 'text-slate-700' : 'text-neutral-300'}`}>
+                      <ImageIcon className={`w-4 h-4 ${isLight ? 'text-[#4946FF]' : 'text-emerald-400'}`} />
+                      <span>ENTRY CHART SCREENSHOT</span>
+                    </div>
+
+                    <div className="flex items-center space-x-2 font-mono text-xs">
+                      <button
+                        onClick={() => handleOpenLightbox(previewTrade.screenshot!)}
+                        className={`px-3 py-1.5 rounded-lg font-bold flex items-center space-x-1.5 border transition-all cursor-pointer shadow-sm ${
+                          isLight
+                            ? 'bg-[#4946FF] text-white border-[#3B38EC] hover:bg-[#3B38EC]'
+                            : 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-500'
+                        }`}
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        <span>FULLSCREEN / ZOOM</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleOpenNewTab(previewTrade.screenshot!)}
+                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                          isLight ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700' : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-neutral-300'
+                        }`}
+                        title="Open full image in new browser tab"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                  <div className={`border rounded-xl overflow-hidden ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800'}`}>
+
+                  {/* Clickable Image Preview Box */}
+                  <div
+                    onClick={() => handleOpenLightbox(previewTrade.screenshot!)}
+                    className={`group relative border rounded-xl overflow-hidden cursor-pointer transition-all duration-200 shadow-inner ${
+                      isLight ? 'bg-slate-100 border-slate-300 hover:border-[#4946FF]' : 'bg-neutral-950 border-neutral-800 hover:border-emerald-500'
+                    }`}
+                  >
                     <img
                       src={previewTrade.screenshot}
-                      alt="Trade Chart"
-                      className="w-full max-h-[350px] object-contain rounded-lg"
+                      alt="Trade Chart Preview"
+                      className="w-full max-h-[480px] object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.01]"
                     />
+
+                    {/* Hover Overlay Prompt */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 text-white font-mono text-xs font-bold uppercase backdrop-blur-xs">
+                      <ZoomIn className="w-5 h-5 text-emerald-400" />
+                      <span>CLICK FOR FULLSCREEN & HIGH-RES ZOOM</span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -979,6 +1054,95 @@ export const TradeJournal: React.FC = () => {
                 </button>
               </div>
             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* FULLSCREEN HIGH-RESOLUTION LIGHTBOX & INTERACTIVE ZOOM MODAL */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-between p-4 overflow-hidden select-none">
+            {/* Top Toolbar */}
+            <div className="w-full max-w-7xl flex flex-wrap items-center justify-between gap-4 bg-neutral-950/90 border border-neutral-800/90 px-6 py-3 rounded-xl z-10 shadow-2xl">
+              <div className="flex items-center space-x-3 text-white font-mono text-xs">
+                <ImageIcon className="w-5 h-5 text-emerald-400" />
+                <span className="font-bold uppercase tracking-wider">FULL HIGH-RESOLUTION CHART VIEW</span>
+                {previewTrade && (
+                  <>
+                    <span className="text-neutral-600">&bull;</span>
+                    <span className="text-emerald-400 font-bold">{previewTrade.pair}</span>
+                    <span className="text-neutral-500">({previewTrade.date})</span>
+                  </>
+                )}
+              </div>
+
+              {/* Interactive Zoom Controls */}
+              <div className="flex items-center space-x-2 font-mono text-xs">
+                <div className="bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg text-white font-bold">
+                  ZOOM: {Math.round(zoomScale * 100)}%
+                </div>
+
+                <button
+                  onClick={handleZoomIn}
+                  className="p-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white rounded-lg transition-colors cursor-pointer"
+                  title="Zoom In (+)"
+                >
+                  <ZoomIn className="w-4 h-4 text-emerald-400" />
+                </button>
+
+                <button
+                  onClick={handleZoomOut}
+                  className="p-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white rounded-lg transition-colors cursor-pointer"
+                  title="Zoom Out (-)"
+                >
+                  <ZoomOut className="w-4 h-4 text-amber-400" />
+                </button>
+
+                <button
+                  onClick={() => setZoomScale(1)}
+                  className="p-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white rounded-lg transition-colors cursor-pointer"
+                  title="Reset Zoom (100%)"
+                >
+                  <RotateCcw className="w-4 h-4 text-neutral-300" />
+                </button>
+
+                <button
+                  onClick={() => handleOpenNewTab(lightboxImage)}
+                  className="px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white rounded-lg font-bold flex items-center space-x-1.5 cursor-pointer"
+                  title="Open Original Image File"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">ORIGINAL</span>
+                </button>
+
+                <button
+                  onClick={() => setLightboxImage(null)}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold uppercase transition-colors cursor-pointer ml-2"
+                >
+                  CLOSE ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Main Interactive Zoomable Canvas */}
+            <div className="w-full flex-1 flex items-center justify-center overflow-auto p-4 my-2 scrollbar-thin">
+              <motion.div
+                animate={{ scale: zoomScale }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="max-w-none max-h-none flex items-center justify-center"
+              >
+                <img
+                  src={lightboxImage}
+                  alt="High Resolution Chart"
+                  className="max-w-[92vw] max-h-[82vh] object-contain rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-neutral-800"
+                />
+              </motion.div>
+            </div>
+
+            {/* Bottom Tip */}
+            <div className="text-[10px] font-mono text-neutral-500 z-10 uppercase tracking-widest text-center">
+              USE ZOOM BUTTONS ABOVE OR OPEN ORIGINAL FOR DEEP CANDLE WICK & LEVEL INSPECTION &bull; PRESS ESC / CLOSE TO EXIT
+            </div>
           </div>
         )}
       </AnimatePresence>
