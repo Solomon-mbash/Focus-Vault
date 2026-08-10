@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFocusStore } from '@/store/useFocusStore';
-import { Trade, TradingSession, TradeDirection, TradeResult } from '@/types';
+import { Trade, TradingSession, TradeDirection, TradeResult, TradeType } from '@/types';
 import { format } from 'date-fns';
 import {
   TrendingUp,
@@ -19,6 +19,8 @@ import {
   Layers,
   FileText,
   Sparkles,
+  FlaskConical,
+  Activity,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,10 +28,14 @@ export const TradeJournal: React.FC = () => {
   const { trades, addTrade, deleteTrade, theme } = useFocusStore();
   const isLight = theme === 'light';
 
+  // Filter View mode: 'ALL' | 'Real' | 'Backtest'
+  const [tradeTypeFilter, setTradeTypeFilter] = useState<'ALL' | 'Real' | 'Backtest'>('ALL');
+
   // Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [session, setSession] = useState<TradingSession>('London');
+  const [tradeType, setTradeType] = useState<TradeType>('Real');
   const [pair, setPair] = useState('EURUSD');
   const [direction, setDirection] = useState<TradeDirection>('Long');
   const [model, setModel] = useState('Turtle Soup + FVG + BOS');
@@ -62,6 +68,7 @@ export const TradeJournal: React.FC = () => {
     addTrade({
       date,
       session,
+      tradeType,
       pair: pair.trim().toUpperCase(),
       direction,
       model: model.trim(),
@@ -79,9 +86,17 @@ export const TradeJournal: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Leak Detector logic
+  // Filter trades based on selected filter mode
+  const filteredTrades = trades.filter((t) => {
+    const type = t.tradeType || 'Real';
+    if (tradeTypeFilter === 'Real') return type === 'Real';
+    if (tradeTypeFilter === 'Backtest') return type === 'Backtest';
+    return true; // 'ALL'
+  });
+
+  // Leak Detector logic (based on filtered trades)
   const mistakeCounts: Record<string, number> = {};
-  trades.forEach((t) => {
+  filteredTrades.forEach((t) => {
     if (t.mistakeTag && t.mistakeTag !== 'None') {
       mistakeCounts[t.mistakeTag] = (mistakeCounts[t.mistakeTag] || 0) + 1;
     }
@@ -96,7 +111,7 @@ export const TradeJournal: React.FC = () => {
     }
   });
 
-  const sortedTrades = [...trades].sort(
+  const sortedTrades = [...filteredTrades].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
@@ -104,7 +119,7 @@ export const TradeJournal: React.FC = () => {
 
   let currentEquity = 0;
   // Sort chronologically for equity curve
-  const chronoTrades = [...trades].sort(
+  const chronoTrades = [...filteredTrades].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
   const equityPoints = chronoTrades.map((t) => {
@@ -112,9 +127,12 @@ export const TradeJournal: React.FC = () => {
     return { date: t.date, equity: currentEquity };
   });
 
-  const totalPnL = trades.reduce((acc, t) => acc + t.pnl, 0);
-  const winCount = trades.filter((t) => t.result === 'Win').length;
-  const winRate = trades.length > 0 ? Math.round((winCount / trades.length) * 100) : 0;
+  const totalPnL = filteredTrades.reduce((acc, t) => acc + t.pnl, 0);
+  const winCount = filteredTrades.filter((t) => t.result === 'Win').length;
+  const winRate = filteredTrades.length > 0 ? Math.round((winCount / filteredTrades.length) * 100) : 0;
+
+  const realCount = trades.filter((t) => (t.tradeType || 'Real') === 'Real').length;
+  const backtestCount = trades.filter((t) => t.tradeType === 'Backtest').length;
 
   // SVG Chart Dimensions
   const chartHeight = 160;
@@ -175,6 +193,69 @@ export const TradeJournal: React.FC = () => {
         </div>
       </div>
 
+      {/* FILTER TABS: ALL TRADES / REAL TRADES / BACKTESTING */}
+      <div
+        className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border ${
+          isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#111111] border-neutral-800/80'
+        }`}
+      >
+        <div className="flex items-center space-x-2 font-mono text-xs">
+          <Activity className={`w-4 h-4 ${isLight ? 'text-[#4946FF]' : 'text-emerald-400'}`} />
+          <span className={`font-bold uppercase ${isLight ? 'text-slate-700' : 'text-neutral-400'}`}>MODE FILTER:</span>
+        </div>
+
+        <div
+          className={`flex items-center space-x-1.5 p-1 rounded-lg border ${
+            isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800'
+          }`}
+        >
+          <button
+            onClick={() => setTradeTypeFilter('ALL')}
+            className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer ${
+              tradeTypeFilter === 'ALL'
+                ? isLight
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'bg-neutral-800 text-white shadow-[0_0_10px_rgba(0,0,0,0.5)]'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            ALL TRADES ({trades.length})
+          </button>
+
+          <button
+            onClick={() => setTradeTypeFilter('Real')}
+            className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer flex items-center space-x-1 ${
+              tradeTypeFilter === 'Real'
+                ? isLight
+                  ? 'bg-[#4946FF] text-white shadow-md'
+                  : 'bg-emerald-600 text-white shadow-[0_0_10px_rgba(16,185,129,0.4)]'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            <span>REAL / LIVE ({realCount})</span>
+          </button>
+
+          <button
+            onClick={() => setTradeTypeFilter('Backtest')}
+            className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer flex items-center space-x-1 ${
+              tradeTypeFilter === 'Backtest'
+                ? 'bg-purple-600 text-white shadow-md'
+                : isLight
+                ? 'text-slate-600 hover:text-slate-900'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            <span>BACKTESTING ({backtestCount})</span>
+          </button>
+        </div>
+      </div>
+
       {/* LATEST TRADE QUICK CONFLUENCE PREVIEW PANEL */}
       {latestTrade && (
         <div
@@ -206,7 +287,16 @@ export const TradeJournal: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
             {/* Pair & Result */}
             <div className={`p-3 rounded-lg border space-y-1 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-neutral-950 border-neutral-800'}`}>
-              <div className={`text-[10px] uppercase ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>INSTRUMENT & RESULT</div>
+              <div className={`text-[10px] uppercase flex items-center justify-between ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
+                <span>INSTRUMENT & RESULT</span>
+                <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold uppercase ${
+                  (latestTrade.tradeType || 'Real') === 'Backtest'
+                    ? 'bg-purple-500/10 text-purple-600 border border-purple-500/30'
+                    : 'bg-[#4946FF]/10 text-[#4946FF] border border-[#4946FF]/30'
+                }`}>
+                  {latestTrade.tradeType || 'Real'}
+                </span>
+              </div>
               <div className="flex items-center space-x-2">
                 <span className="text-base font-extrabold">{latestTrade.pair}</span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -267,8 +357,10 @@ export const TradeJournal: React.FC = () => {
         }`}
       >
         <div className={`flex items-center justify-between text-xs font-mono border-b pb-3 ${isLight ? 'border-slate-200 text-slate-500' : 'border-neutral-800 text-neutral-400'}`}>
-          <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>EQUITY CURVE GROWTH ($ PnL)</span>
-          <span className="font-bold">{trades.length} TOTAL TRADES LOGGED</span>
+          <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>
+            EQUITY CURVE GROWTH ({tradeTypeFilter === 'ALL' ? 'ALL TRADES' : tradeTypeFilter === 'Real' ? 'REAL TRADES' : 'BACKTESTING'})
+          </span>
+          <span className="font-bold">{sortedTrades.length} TRADES IN VIEW</span>
         </div>
 
         <div className="w-full overflow-x-auto py-2">
@@ -310,19 +402,23 @@ export const TradeJournal: React.FC = () => {
           isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
         }`}
       >
-        <div className={`p-4 border-b text-xs font-mono font-bold uppercase tracking-wider ${isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-neutral-950 border-neutral-800 text-white'}`}>
-          JOURNAL ENTRIES ({sortedTrades.length})
+        <div className={`p-4 border-b text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-between ${isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-neutral-950 border-neutral-800 text-white'}`}>
+          <span>JOURNAL ENTRIES ({sortedTrades.length})</span>
+          <span className={`text-[10px] font-normal ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
+            SHOWING: {tradeTypeFilter}
+          </span>
         </div>
 
         {sortedTrades.length === 0 ? (
           <div className={`p-12 text-center font-mono text-xs ${isLight ? 'text-slate-400' : 'text-neutral-500'}`}>
-            No trades logged yet. Click "LOG SMC TRADE" to record your execution.
+            No trades logged for this filter. Click "LOG SMC TRADE" to record your execution.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-xs border-collapse">
               <thead>
                 <tr className={`border-b ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'}`}>
+                  <th className="p-3.5">MODE</th>
                   <th className="p-3.5">DATE / SESSION</th>
                   <th className="p-3.5">PAIR</th>
                   <th className="p-3.5">DIR</th>
@@ -335,92 +431,110 @@ export const TradeJournal: React.FC = () => {
                 </tr>
               </thead>
               <tbody className={`divide-y ${isLight ? 'divide-slate-200' : 'divide-neutral-800/60'}`}>
-                {sortedTrades.map((t) => (
-                  <tr key={t.id} className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-neutral-950/60'}`}>
-                    <td className="p-3.5">
-                      <div className="font-semibold">{t.date}</div>
-                      <div className={`text-[10px] uppercase ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>{t.session}</div>
-                    </td>
-                    <td className="p-3.5 font-bold">{t.pair}</td>
-                    <td className="p-3.5">
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                          t.direction === 'Long'
-                            ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30'
-                            : 'bg-red-500/10 text-red-600 border border-red-500/30'
-                        }`}
-                      >
-                        {t.direction}
-                      </span>
-                    </td>
-                    <td className="p-3.5 font-semibold">{t.model}</td>
-                    <td className="p-3.5">
-                      {t.followedPlan ? (
-                        <span className="text-emerald-600 font-bold flex items-center space-x-1">
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          <span>YES</span>
+                {sortedTrades.map((t) => {
+                  const mode = t.tradeType || 'Real';
+                  const isBacktest = mode === 'Backtest';
+
+                  return (
+                    <tr key={t.id} className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-neutral-950/60'}`}>
+                      <td className="p-3.5">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            isBacktest
+                              ? 'bg-purple-500/10 text-purple-600 border border-purple-500/30'
+                              : isLight
+                              ? 'bg-[#4946FF]/10 text-[#4946FF] border border-[#4946FF]/30'
+                              : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                          }`}
+                        >
+                          {mode}
                         </span>
-                      ) : (
-                        <span className="text-red-500 font-bold flex items-center space-x-1">
-                          <XCircle className="w-3.5 h-3.5" />
-                          <span>NO</span>
+                      </td>
+                      <td className="p-3.5">
+                        <div className="font-semibold">{t.date}</div>
+                        <div className={`text-[10px] uppercase ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>{t.session}</div>
+                      </td>
+                      <td className="p-3.5 font-bold">{t.pair}</td>
+                      <td className="p-3.5">
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                            t.direction === 'Long'
+                              ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/30'
+                              : 'bg-red-500/10 text-red-600 border border-red-500/30'
+                          }`}
+                        >
+                          {t.direction}
                         </span>
-                      )}
-                    </td>
-                    <td className="p-3.5">
-                      <span
-                        className={`font-bold ${
-                          t.result === 'Win'
-                            ? 'text-emerald-600'
-                            : t.result === 'Loss'
-                            ? 'text-red-500'
-                            : 'text-amber-500'
-                        }`}
-                      >
-                        {t.result} ({t.r >= 0 ? `+${t.r}R` : `${t.r}R`})
-                      </span>
-                    </td>
-                    <td className={`p-3.5 font-bold ${t.pnl >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                      {t.pnl >= 0 ? `+$${t.pnl}` : `-$${Math.abs(t.pnl)}`}
-                    </td>
-                    <td className="p-3.5">
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] ${
-                          t.mistakeTag !== 'None'
-                            ? 'bg-red-500/10 text-red-600 border border-red-500/30 font-bold'
-                            : isLight
-                            ? 'text-slate-400'
-                            : 'text-neutral-500'
-                        }`}
-                      >
-                        {t.mistakeTag}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-right space-x-2">
-                      <button
-                        onClick={() => setPreviewTrade(t)}
-                        className={`px-2 py-1 border rounded-md transition-colors cursor-pointer text-[10px] font-bold inline-flex items-center space-x-1 ${
-                          isLight
-                            ? 'bg-[#4946FF]/10 text-[#4946FF] border-[#4946FF]/30 hover:bg-[#4946FF]/20'
-                            : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-neutral-300'
-                        }`}
-                        title="Preview Confluence & Details"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>PREVIEW</span>
-                      </button>
-                      <button
-                        onClick={() => deleteTrade(t.id)}
-                        className={`p-1.5 rounded transition-colors cursor-pointer ${
-                          isLight ? 'text-slate-400 hover:text-red-600 hover:bg-slate-100' : 'text-neutral-500 hover:text-red-400 hover:bg-neutral-800'
-                        }`}
-                        title="Delete Trade"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3.5 font-semibold">{t.model}</td>
+                      <td className="p-3.5">
+                        {t.followedPlan ? (
+                          <span className="text-emerald-600 font-bold flex items-center space-x-1">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>YES</span>
+                          </span>
+                        ) : (
+                          <span className="text-red-500 font-bold flex items-center space-x-1">
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>NO</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3.5">
+                        <span
+                          className={`font-bold ${
+                            t.result === 'Win'
+                              ? 'text-emerald-600'
+                              : t.result === 'Loss'
+                              ? 'text-red-500'
+                              : 'text-amber-500'
+                          }`}
+                        >
+                          {t.result} ({t.r >= 0 ? `+${t.r}R` : `${t.r}R`})
+                        </span>
+                      </td>
+                      <td className={`p-3.5 font-bold ${t.pnl >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {t.pnl >= 0 ? `+$${t.pnl}` : `-$${Math.abs(t.pnl)}`}
+                      </td>
+                      <td className="p-3.5">
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-[10px] ${
+                            t.mistakeTag !== 'None'
+                              ? 'bg-red-500/10 text-red-600 border border-red-500/30 font-bold'
+                              : isLight
+                              ? 'text-slate-400'
+                              : 'text-neutral-500'
+                          }`}
+                        >
+                          {t.mistakeTag}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-right space-x-2">
+                        <button
+                          onClick={() => setPreviewTrade(t)}
+                          className={`px-2 py-1 border rounded-md transition-colors cursor-pointer text-[10px] font-bold inline-flex items-center space-x-1 ${
+                            isLight
+                              ? 'bg-[#4946FF]/10 text-[#4946FF] border-[#4946FF]/30 hover:bg-[#4946FF]/20'
+                              : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-neutral-300'
+                          }`}
+                          title="Preview Confluence & Details"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>PREVIEW</span>
+                        </button>
+                        <button
+                          onClick={() => deleteTrade(t.id)}
+                          className={`p-1.5 rounded transition-colors cursor-pointer ${
+                            isLight ? 'text-slate-400 hover:text-red-600 hover:bg-slate-100' : 'text-neutral-500 hover:text-red-400 hover:bg-neutral-800'
+                          }`}
+                          title="Delete Trade"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -453,6 +567,46 @@ export const TradeJournal: React.FC = () => {
               </div>
 
               <form onSubmit={handleCreateTrade} className="space-y-4 font-mono text-xs">
+                {/* TRADE TYPE SELECTOR (Real vs Backtest) */}
+                <div>
+                  <label className={`block mb-1.5 font-bold uppercase ${isLight ? 'text-slate-700' : 'text-neutral-300'}`}>
+                    TRADE EXECUTION TYPE (MODE)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setTradeType('Real')}
+                      className={`py-2.5 px-3 rounded-lg border font-mono font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                        tradeType === 'Real'
+                          ? isLight
+                            ? 'bg-[#4946FF] text-white border-[#3B38EC] shadow-md shadow-[#4946FF]/30'
+                            : 'bg-emerald-600 text-white border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                          : isLight
+                          ? 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'
+                          : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      <Activity className="w-4 h-4" />
+                      <span>REAL TRADE (LIVE)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTradeType('Backtest')}
+                      className={`py-2.5 px-3 rounded-lg border font-mono font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                        tradeType === 'Backtest'
+                          ? 'bg-purple-600 text-white border-purple-500 shadow-md'
+                          : isLight
+                          ? 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'
+                          : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      <FlaskConical className="w-4 h-4" />
+                      <span>BACKTESTING</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={`block mb-1 ${isLight ? 'text-slate-600' : 'text-neutral-400'}`}>DATE</label>
@@ -711,6 +865,15 @@ export const TradeJournal: React.FC = () => {
                       : 'bg-red-500/10 text-red-600 border border-red-500/30'
                   }`}>
                     {previewTrade.direction}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs font-mono font-bold uppercase ${
+                      (previewTrade.tradeType || 'Real') === 'Backtest'
+                        ? 'bg-purple-500/10 text-purple-600 border border-purple-500/30'
+                        : 'bg-[#4946FF]/10 text-[#4946FF] border border-[#4946FF]/30'
+                    }`}
+                  >
+                    {previewTrade.tradeType || 'Real'}
                   </span>
                   <span className={`text-xs font-mono ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
                     {previewTrade.date} &bull; {previewTrade.session} Session

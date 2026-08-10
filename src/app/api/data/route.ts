@@ -6,6 +6,7 @@ export async function GET() {
     const tasks = db.prepare('SELECT * FROM tasks').all();
     const trades = db.prepare('SELECT * FROM trades').all().map((t: any) => ({
       ...t,
+      tradeType: t.tradeType || 'Real',
       followedPlan: Boolean(t.followedPlan),
     }));
 

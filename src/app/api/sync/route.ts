@@ -35,14 +35,15 @@ export async function POST(req: Request) {
       if (Array.isArray(trades)) {
         db.prepare('DELETE FROM trades').run();
         const insertTrade = db.prepare(`
-          INSERT INTO trades (id, date, session, pair, direction, model, reason, followedPlan, result, r, pnl, mistakeTag, screenshot)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO trades (id, date, session, tradeType, pair, direction, model, reason, followedPlan, result, r, pnl, mistakeTag, screenshot)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         for (const tr of trades) {
           insertTrade.run(
             tr.id,
             tr.date,
             tr.session,
+            tr.tradeType || 'Real',
             tr.pair,
             tr.direction,
             tr.model,

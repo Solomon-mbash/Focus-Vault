@@ -25,11 +25,13 @@ export type TradingSession =
   | 'Overnight';
 export type TradeDirection = 'Long' | 'Short';
 export type TradeResult = 'Win' | 'Loss' | 'BE';
+export type TradeType = 'Real' | 'Backtest';
 
 export interface Trade {
   id: string;
   date: string; // YYYY-MM-DD
   session: TradingSession;
+  tradeType?: TradeType; // 'Real' | 'Backtest'
   pair: string;
   direction: TradeDirection;
   model: string;

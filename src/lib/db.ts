@@ -34,6 +34,7 @@ db.exec(`
     id TEXT PRIMARY KEY,
     date TEXT NOT NULL,
     session TEXT NOT NULL,
+    tradeType TEXT DEFAULT 'Real',
     pair TEXT NOT NULL,
     direction TEXT NOT NULL,
     model TEXT NOT NULL,
@@ -75,5 +76,11 @@ db.exec(`
     createdAt TEXT NOT NULL
   );
 `);
+
+try {
+  db.exec("ALTER TABLE trades ADD COLUMN tradeType TEXT DEFAULT 'Real'");
+} catch {
+  // column already exists
+}
 
 export default db;
