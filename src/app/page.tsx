@@ -25,10 +25,10 @@ export default function Home() {
 
   if (!isHydrated) {
     return (
-      <div className="min-h-screen bg-neutral-950 text-white font-mono flex items-center justify-center">
-        <div className="flex items-center space-x-3 text-red-500 font-bold tracking-widest text-sm">
-          <span className="w-3 h-3 bg-red-600 rounded-full animate-ping" />
-          <span>INITIALIZING FOCUS VAULT EXECUTION PRISON...</span>
+      <div className="min-h-screen bg-[#09090B] text-white font-mono flex items-center justify-center">
+        <div className="flex items-center space-x-3 text-neutral-400 font-semibold tracking-wider text-xs">
+          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
+          <span>INITIALIZING FOCUS VAULT...</span>
         </div>
       </div>
     );
@@ -36,40 +36,40 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen font-sans flex flex-col transition-colors duration-300 ${
+      className={`min-h-screen font-sans flex flex-col transition-colors duration-200 ${
         isLight
-          ? 'bg-[#F8FAFC] text-[#0F172A] selection:bg-[#4946FF] selection:text-white'
-          : 'bg-[#0A0A0A] text-[#E5E5E5] selection:bg-red-900 selection:text-white'
+          ? 'bg-[#FAFAFA] text-neutral-900 selection:bg-neutral-900 selection:text-white'
+          : 'bg-[#09090B] text-neutral-100 selection:bg-neutral-100 selection:text-neutral-900'
       }`}
     >
-      {/* FEATURE 4: MOTIVATION WALL (Top 30% of screen, shows on EVERY open) */}
+      {/* MOTIVATION DIRECTIVE (Top strip) */}
       <MotivationWall />
 
       {/* Navigation Header */}
       <Navbar />
 
       {/* Main Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-8">
+      <div className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 md:py-8">
         <AnimatePresence mode="wait">
           {activeTab === 'board' && (
             <motion.div
               key="board"
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-8"
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-6"
             >
-              {/* Pomodoro Execution Prison Clock */}
+              {/* Pomodoro Focus Clock */}
               <PomodoroTimer />
 
               {/* Daily Execution Board */}
               <TaskBoard />
 
-              {/* Daily Evening Reflection Checklist (4 Questions) */}
+              {/* Daily Evening Reflection */}
               <DailyReflectionSection />
 
-              {/* Focus Formula & Evening Review & 30-Day Heatmap */}
+              {/* Focus Formula & 30-Day Heatmap */}
               <FocusFormulaSection />
             </motion.div>
           )}
@@ -77,10 +77,10 @@ export default function Home() {
           {activeTab === 'journal' && (
             <motion.div
               key="journal"
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
             >
               <TradeJournal />
             </motion.div>
@@ -89,10 +89,10 @@ export default function Home() {
           {activeTab === 'later' && (
             <motion.div
               key="later"
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
             >
               <LaterList />
             </motion.div>
@@ -100,17 +100,17 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      {/* Footer */}
+      {/* Minimal Footer */}
       <footer
         className={`w-full py-6 text-center text-xs font-mono border-t transition-colors ${
           isLight
-            ? 'bg-white border-slate-200 text-slate-500'
-            : 'bg-neutral-950 border-neutral-900 text-neutral-600'
+            ? 'bg-white border-neutral-200/80 text-neutral-400'
+            : 'bg-[#09090B] border-neutral-800/80 text-neutral-600'
         }`}
       >
         <div>FOCUS VAULT &bull; SINGLE PURPOSE EXECUTION ENGINE</div>
-        <div className={`mt-1 text-[10px] ${isLight ? 'text-slate-400' : 'text-neutral-700'}`}>
-          "only i want is: discipline & focus. And Not more information."
+        <div className={`mt-0.5 text-[10px] ${isLight ? 'text-neutral-400' : 'text-neutral-600'}`}>
+          discipline &bull; focus &bull; execution
         </div>
       </footer>
     </main>

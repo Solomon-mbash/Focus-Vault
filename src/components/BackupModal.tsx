@@ -47,67 +47,67 @@ export const BackupModal: React.FC<BackupModalProps> = ({ isOpen, onClose }) => 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
+          initial={{ scale: 0.98, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          className={`rounded-xl p-6 max-w-md w-full shadow-2xl space-y-5 border ${
-            isLight ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
+          exit={{ scale: 0.98, opacity: 0 }}
+          className={`rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 border ${
+            isLight ? 'bg-white border-neutral-200 text-neutral-900' : 'bg-[#101014] border-neutral-800 text-neutral-100'
           }`}
         >
-          <div className={`flex items-center justify-between border-b pb-3 ${isLight ? 'border-slate-200' : 'border-neutral-800'}`}>
-            <h3 className="text-base font-mono font-bold flex items-center space-x-2">
-              <Database className={`w-5 h-5 ${isLight ? 'text-[#4946FF]' : 'text-emerald-400'}`} />
-              <span>SQLITE DATABASE & BACKUP VAULT</span>
+          <div className="flex items-center justify-between border-b pb-3 border-neutral-200/60 dark:border-neutral-800/60">
+            <h3 className="text-base font-bold flex items-center space-x-2">
+              <Database className="w-4 h-4 text-neutral-500" />
+              <span>Database & Backup</span>
             </h3>
             <button
               onClick={onClose}
-              className={`text-sm font-mono ${isLight ? 'text-slate-400 hover:text-slate-700' : 'text-neutral-500 hover:text-white'}`}
+              className={`text-sm ${isLight ? 'text-neutral-400 hover:text-neutral-700' : 'text-neutral-500 hover:text-white'}`}
             >
               ✕
             </button>
           </div>
 
-          <div className="space-y-3 font-mono text-xs">
-            <div className={`p-3 rounded-lg border space-y-1.5 ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'}`}>
-              <div className={`font-bold flex items-center space-x-1.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+          <div className="space-y-3 text-xs font-mono">
+            <div className={`p-3 rounded-xl border space-y-1 ${isLight ? 'bg-neutral-50 border-neutral-200/80 text-neutral-600' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
+              <div className={`font-semibold flex items-center space-x-1.5 ${isLight ? 'text-neutral-900' : 'text-white'}`}>
                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 <span>SQLite Disk Persistence Active</span>
               </div>
-              <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
-                Your trades, tasks, vision, and reflections are saved directly to <code className={isLight ? 'text-slate-800 font-bold' : 'text-neutral-300'}>data/focus_vault.db</code> on disk.
+              <p className={`text-[11px] ${isLight ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                Your trades and targets are automatically saved to local SQLite database.
               </p>
             </div>
 
             {/* Export */}
-            <div className={`p-4 rounded-xl border space-y-2 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-neutral-950 border-neutral-800/80'}`}>
-              <div className={`font-bold uppercase text-[11px] ${isLight ? 'text-slate-900' : 'text-white'}`}>1-CLICK EXPORT JSON BACKUP</div>
-              <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
-                Download a complete JSON snapshot file of your trade journal, daily targets, and framework.
+            <div className={`p-3.5 rounded-xl border space-y-2 ${isLight ? 'bg-neutral-50 border-neutral-200/80' : 'bg-neutral-900 border-neutral-800'}`}>
+              <div className="font-semibold text-[11px] uppercase">Export JSON Backup</div>
+              <p className={`text-[11px] ${isLight ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                Download a complete backup snapshot of all your logged trades and tasks.
               </p>
               <button
                 onClick={handleExportJSON}
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold uppercase rounded-lg flex items-center justify-center space-x-2 shadow-lg transition-colors cursor-pointer"
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-semibold rounded-lg flex items-center justify-center space-x-1.5 transition-colors cursor-pointer shadow-xs"
               >
-                <Download className="w-4 h-4" />
-                <span>DOWNLOAD JSON BACKUP</span>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Backup</span>
               </button>
             </div>
 
             {/* Import */}
-            <div className={`p-4 rounded-xl border space-y-2 ${isLight ? 'bg-slate-50 border-slate-200' : 'bg-neutral-950 border-neutral-800/80'}`}>
-              <div className={`font-bold uppercase text-[11px] ${isLight ? 'text-slate-900' : 'text-white'}`}>RESTORE FROM JSON BACKUP</div>
-              <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
-                Upload a previously exported JSON backup file to restore all your data.
+            <div className={`p-3.5 rounded-xl border space-y-2 ${isLight ? 'bg-neutral-50 border-neutral-200/80' : 'bg-neutral-900 border-neutral-800'}`}>
+              <div className="font-semibold text-[11px] uppercase">Restore Backup</div>
+              <p className={`text-[11px] ${isLight ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                Upload a previously exported JSON backup file.
               </p>
-              <label className={`w-full py-2.5 font-mono text-xs font-bold uppercase rounded-lg flex items-center justify-center space-x-2 border transition-colors cursor-pointer ${
+              <label className={`w-full py-2 font-mono text-xs font-semibold rounded-lg flex items-center justify-center space-x-1.5 border transition-colors cursor-pointer ${
                 isLight
-                  ? 'bg-white hover:bg-slate-100 border-slate-300 text-slate-800'
+                  ? 'bg-white hover:bg-neutral-100 border-neutral-200 text-neutral-800'
                   : 'bg-neutral-800 hover:bg-neutral-700 border-neutral-700 text-white'
               }`}>
-                <Upload className="w-4 h-4 text-amber-500" />
-                <span>UPLOAD BACKUP FILE (.JSON)</span>
+                <Upload className="w-3.5 h-3.5 text-amber-500" />
+                <span>Upload .JSON File</span>
                 <input
                   type="file"
                   accept=".json"
@@ -118,21 +118,21 @@ export const BackupModal: React.FC<BackupModalProps> = ({ isOpen, onClose }) => 
             </div>
 
             {importStatus && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 font-bold rounded-lg text-center flex items-center justify-center space-x-2">
+              <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold rounded-lg text-center flex items-center justify-center space-x-1.5">
                 <Check className="w-4 h-4" />
                 <span>{importStatus}</span>
               </div>
             )}
           </div>
 
-          <div className={`flex justify-end pt-2 border-t ${isLight ? 'border-slate-200' : 'border-neutral-800'}`}>
+          <div className="flex justify-end pt-2 border-t border-neutral-200/60 dark:border-neutral-800/60">
             <button
               onClick={onClose}
-              className={`px-4 py-2 rounded-lg text-xs font-mono border ${
-                isLight ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white'
+              className={`px-4 py-1.5 rounded-xl text-xs font-medium border ${
+                isLight ? 'bg-neutral-50 border-neutral-200 text-neutral-600' : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
               }`}
             >
-              CLOSE
+              Close
             </button>
           </div>
         </motion.div>

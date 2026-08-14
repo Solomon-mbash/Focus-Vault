@@ -46,7 +46,7 @@ export const PomodoroTimer: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeTask, timerMode, togglePomodoro, resetPomodoro, skipBreak]);
 
-  // Wall-Clock Timer interval tick & Background Tab Visibility Sync
+  // Wall-Clock Timer tick
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -75,13 +75,13 @@ export const PomodoroTimer: React.FC = () => {
   const seconds = pomodoroSecondsLeft % 60;
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-  // Live Browser Tab Title Update
+  // Browser Tab Title
   useEffect(() => {
     if (isPomodoroRunning) {
       const modeTag = timerMode === 'break' ? '[BREAK]' : '[WORK]';
       document.title = `(${formattedTime}) ${modeTag} FOCUS VAULT`;
     } else {
-      document.title = 'FOCUS VAULT | Discipline Execution Engine';
+      document.title = 'FOCUS VAULT';
     }
   }, [formattedTime, isPomodoroRunning, timerMode]);
 
@@ -93,281 +93,223 @@ export const PomodoroTimer: React.FC = () => {
 
   return (
     <div
-      className={`w-full rounded-xl p-6 transition-all duration-300 relative overflow-hidden select-none border ${
+      className={`w-full rounded-2xl p-6 md:p-8 transition-colors duration-200 border relative overflow-hidden select-none ${
         isLight
-          ? 'bg-white border-slate-200 shadow-xl shadow-slate-200/50 text-slate-800'
-          : 'bg-[#111111] border-neutral-800 shadow-2xl text-white'
-      } ${
-        timerMode === 'break'
-          ? isLight
-            ? 'border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.2)]'
-            : 'border-amber-500/80 shadow-[0_0_30px_rgba(245,158,11,0.25)]'
-          : isPomodoroRunning
-          ? isLight
-            ? 'border-[#4946FF] shadow-[0_0_30px_rgba(73,70,255,0.25)]'
-            : 'border-red-500/80 shadow-[0_0_30px_rgba(239,68,68,0.2)]'
-          : ''
+          ? 'bg-white border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.02)] text-neutral-900'
+          : 'bg-[#101014] border-neutral-800/80 shadow-xl text-neutral-100'
       }`}
     >
-      {/* Ambient Radial Glow */}
-      {isPomodoroRunning && (
-        <div
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none animate-pulse ${
-            timerMode === 'break'
-              ? 'bg-amber-500/15'
-              : isLight
-              ? 'bg-[#4946FF]/15'
-              : 'bg-red-600/10'
-          }`}
-        />
-      )}
-
-      {/* Top Header */}
-      <div
-        className={`flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-6 z-10 relative ${
-          isLight ? 'border-slate-200' : 'border-neutral-800/80'
-        }`}
-      >
-        <div className="flex items-center space-x-2.5 font-mono text-xs tracking-wider">
+      {/* Top Header Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4 mb-6 border-neutral-200/60 dark:border-neutral-800/60">
+        <div className="flex items-center space-x-2 text-xs font-mono">
           <div
-            className={`p-1 border rounded ${
+            className={`w-2 h-2 rounded-full ${
               timerMode === 'break'
-                ? isLight
-                  ? 'bg-amber-50 border-amber-300 text-amber-600'
-                  : 'bg-amber-950/80 border-amber-800 text-amber-400'
+                ? 'bg-amber-500'
+                : isPomodoroRunning
+                ? 'bg-emerald-500 animate-pulse'
                 : isLight
-                ? 'bg-[#4946FF]/10 border-[#4946FF]/30 text-[#4946FF]'
-                : 'bg-red-950/80 border-red-800 text-red-500'
+                ? 'bg-neutral-400'
+                : 'bg-neutral-600'
             }`}
-          >
-            {timerMode === 'break' ? <Coffee className="w-4 h-4" /> : <Timer className="w-4 h-4" />}
-          </div>
-          <span
-            className={`uppercase font-bold tracking-widest text-[12px] ${
-              isLight ? 'text-slate-800' : 'text-white'
-            }`}
-          >
-            {timerMode === 'break' ? 'RECOVERY BREAK TIME (5M)' : 'POMODORO EXECUTION PRISON'}
-          </span>
-          <span className={`hidden sm:inline ${isLight ? 'text-slate-300' : 'text-neutral-600'}`}>
-            &bull;
-          </span>
-          <span
-            className={`hidden sm:inline text-[10px] font-bold uppercase ${
-              isLight ? 'text-slate-400' : 'text-neutral-400'
-            }`}
-          >
-            {timerMode === 'break' ? 'RECHARGE OR SKIP' : 'WALL-CLOCK SYNCED'}
+          />
+          <span className="font-semibold tracking-wider uppercase text-[11px]">
+            {timerMode === 'break' ? 'Recovery Break (5m)' : 'Deep Work Session'}
           </span>
         </div>
 
-        {/* Duration Selectors (15m, 25m, 30m, 50m, 60m, 90m) */}
+        {/* Duration Selectors */}
         <div
-          className={`flex flex-wrap items-center gap-1 p-1 rounded-lg border ${
-            isLight ? 'bg-slate-100 border-slate-200' : 'bg-neutral-950 border-neutral-800/80'
+          className={`flex items-center p-1 rounded-lg border text-xs font-mono ${
+            isLight ? 'bg-neutral-100/70 border-neutral-200/80' : 'bg-neutral-900 border-neutral-800'
           }`}
         >
           {[15, 25, 30, 50, 60, 90].map((m) => (
             <button
               key={m}
               onClick={() => setPomodoroDuration(m)}
-              className={`px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer ${
                 pomodoroDuration === m && timerMode === 'work'
                   ? isLight
-                    ? 'bg-[#4946FF] text-white shadow-md shadow-[#4946FF]/30'
-                    : 'bg-red-600 text-white shadow-[0_0_12px_rgba(239,68,68,0.4)]'
+                    ? 'bg-white text-neutral-900 shadow-xs font-semibold'
+                    : 'bg-neutral-800 text-white shadow-xs font-semibold'
                   : isLight
-                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/80'
+                  ? 'text-neutral-500 hover:text-neutral-800'
+                  : 'text-neutral-400 hover:text-neutral-200'
               }`}
             >
-              {m}M
+              {m}m
             </button>
           ))}
         </div>
       </div>
 
-      {/* Active Task Lock-In Banner */}
+      {/* Active Target Banner */}
       <div
-        className={`mb-6 p-4 border-l-4 rounded-r-lg flex flex-wrap items-center justify-between gap-3 shadow-inner z-10 relative ${
-          isLight ? 'bg-slate-50 border-slate-200' : 'bg-neutral-950/90 border-neutral-800'
-        } ${
-          timerMode === 'break'
-            ? 'border-l-amber-500'
-            : isLight
-            ? 'border-l-[#4946FF]'
-            : 'border-l-red-500'
+        className={`mb-6 p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 border transition-colors ${
+          isLight
+            ? 'bg-neutral-50/80 border-neutral-200/80'
+            : 'bg-neutral-900/60 border-neutral-800/80'
         }`}
       >
         <div className="min-w-0 flex-1">
-          <div className="flex items-center space-x-2 text-[10px] font-mono uppercase tracking-widest">
+          <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase tracking-wider mb-0.5">
             {timerMode === 'break' ? (
-              <span className="text-amber-500 font-bold flex items-center space-x-1">
-                <Coffee className="w-3.5 h-3.5" />
-                <span>SHORT BREAK PERIOD</span>
+              <span className="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
+                <Coffee className="w-3 h-3" />
+                <span>Break Period</span>
               </span>
             ) : (
-              <span className={`font-bold flex items-center space-x-1 ${isLight ? 'text-[#4946FF]' : 'text-red-500'}`}>
-                <Zap className="w-3.5 h-3.5" />
-                <span>ACTIVE TARGET LOCK-IN</span>
+              <span className="text-neutral-500 font-semibold flex items-center gap-1">
+                <Zap className="w-3 h-3 text-[#4946FF]" />
+                <span>Active Target</span>
               </span>
             )}
           </div>
-          <div className={`text-base md:text-lg font-bold truncate mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+
+          <div className="text-sm md:text-base font-semibold truncate">
             {timerMode === 'break'
-              ? '5-Minute Short Recovery Break. Rest your eyes or skip break to continue.'
+              ? '5-minute rest. Step away from the screen or skip break.'
               : activeTask
               ? activeTask.title
-              : 'No Task Locked In. Select a task below or pick a duration above to focus.'}
+              : 'No target locked. Select a task below or press start.'}
           </div>
         </div>
 
         {activeTask && timerMode === 'work' && (
-          <div className="flex items-center space-x-3 shrink-0">
+          <div className="flex items-center space-x-2 shrink-0">
             <span
-              className={`px-2.5 py-1 text-xs font-mono uppercase font-bold rounded border ${
+              className={`px-2 py-0.5 text-xs font-mono font-medium rounded border ${
                 activeTask.priority === 'P1'
-                  ? 'bg-red-500/10 text-red-600 border-red-500/30'
+                  ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
                   : activeTask.priority === 'P2'
-                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
-                  : isLight
-                  ? 'bg-slate-200 text-slate-700 border-slate-300'
-                  : 'bg-neutral-800 text-neutral-400 border-neutral-700'
+                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                  : 'bg-neutral-500/10 text-neutral-600 border-neutral-500/20'
               }`}
             >
-              {activeTask.priority} ({activeTask.estTime}m)
+              {activeTask.priority}
             </span>
             <button
               onClick={() => completeTask(activeTask.id, activeTask.estTime)}
-              className="px-3.5 py-1.5 text-xs font-mono font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-md flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-colors cursor-pointer"
+              className="px-3 py-1 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-md flex items-center space-x-1 transition-colors cursor-pointer shadow-xs"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>MARK DONE</span>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Done</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Digital Clock Display */}
-      <div className="flex flex-col items-center justify-center my-6 z-10 relative">
-        <motion.div
-          animate={isPomodoroRunning ? { scale: [1, 1.015, 1] } : {}}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className={`text-7xl md:text-9xl font-black font-mono tracking-tighter py-1 ${
+      {/* Big Digital Clock */}
+      <div className="flex flex-col items-center justify-center my-4">
+        <div
+          className={`text-7xl md:text-9xl font-extrabold font-mono tracking-tighter tabular-nums ${
             timerMode === 'break'
               ? 'text-amber-500'
               : isLight
-              ? 'text-[#0F172A]'
-              : 'text-white drop-shadow-[0_0_35px_rgba(255,255,255,0.1)]'
+              ? 'text-neutral-900'
+              : 'text-white'
           }`}
         >
           {formattedTime}
-        </motion.div>
+        </div>
 
-        {/* Progress Bar */}
+        {/* Minimal Progress Bar */}
         <div
-          className={`w-full max-w-lg h-2.5 rounded-full overflow-hidden border my-4 shadow-inner ${
-            isLight ? 'bg-slate-200 border-slate-300' : 'bg-neutral-950 border-neutral-800/80'
+          className={`w-full max-w-md h-1.5 rounded-full overflow-hidden my-6 ${
+            isLight ? 'bg-neutral-100' : 'bg-neutral-800'
           }`}
         >
           <div
-            className={`h-full transition-all duration-1000 ease-linear shadow-sm ${
+            className={`h-full transition-all duration-500 ease-linear rounded-full ${
               timerMode === 'break'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-300'
+                ? 'bg-amber-500'
                 : isLight
-                ? 'bg-gradient-to-r from-[#4946FF] via-amber-500 to-emerald-500'
-                : 'bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500'
+                ? 'bg-neutral-900'
+                : 'bg-white'
             }`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
 
-        {/* Main Controls */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+        {/* Minimal Action Controls */}
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={togglePomodoro}
             disabled={!activeTask && timerMode === 'work'}
-            className={`px-7 py-3 rounded-lg text-sm font-bold font-mono uppercase tracking-wider flex items-center space-x-2.5 shadow-xl transition-all cursor-pointer ${
+            className={`px-6 py-2.5 rounded-xl text-xs font-semibold tracking-wide flex items-center space-x-2 transition-all cursor-pointer ${
               !activeTask && timerMode === 'work'
                 ? isLight
-                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
-                  : 'bg-neutral-800 text-neutral-600 cursor-not-allowed border border-neutral-700'
+                  ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                  : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
                 : isPomodoroRunning
-                ? 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-500/30'
+                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-xs'
                 : isLight
-                ? 'bg-[#4946FF] hover:bg-[#3B38EC] text-white border border-[#3B38EC] shadow-[0_0_20px_rgba(73,70,255,0.4)]'
-                : 'bg-red-600 hover:bg-red-500 text-white border border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                ? 'bg-neutral-900 hover:bg-neutral-800 text-white shadow-xs'
+                : 'bg-white hover:bg-neutral-100 text-neutral-950 shadow-xs'
             }`}
           >
             {isPomodoroRunning ? (
               <>
-                <Pause className="w-4 h-4 fill-white" />
-                <span>PAUSE</span>
+                <Pause className="w-3.5 h-3.5 fill-current" />
+                <span>Pause</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-white" />
-                <span>{timerMode === 'break' ? 'START BREAK' : 'START FOCUS'}</span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>{timerMode === 'break' ? 'Start Break' : 'Start Focus'}</span>
               </>
             )}
           </button>
 
-          {/* SKIP BREAK BUTTON */}
+          {/* Skip Break */}
           <button
             onClick={skipBreak}
-            className={`px-5 py-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider flex items-center space-x-2 transition-all cursor-pointer shadow-md border ${
+            className={`px-3.5 py-2.5 rounded-xl text-xs font-medium border flex items-center space-x-1.5 transition-colors cursor-pointer ${
               isLight
-                ? 'bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-700'
-                : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-amber-400'
+                ? 'bg-white hover:bg-neutral-50 border-neutral-200/90 text-neutral-700'
+                : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300'
             }`}
-            title="Skip Break & Resume Work Block [Alt+S]"
+            title="Skip Break [Alt+S]"
           >
-            <FastForward className={`w-4 h-4 ${isLight ? 'text-amber-600' : 'text-amber-400'}`} />
-            <span>SKIP BREAK</span>
+            <FastForward className="w-3.5 h-3.5 text-amber-500" />
+            <span>Skip</span>
           </button>
 
+          {/* Reset */}
           <button
             onClick={resetPomodoro}
-            className={`p-3.5 rounded-lg border transition-colors cursor-pointer ${
+            className={`p-2.5 rounded-xl border transition-colors cursor-pointer ${
               isLight
-                ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-600'
-                : 'bg-neutral-950 hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
+                ? 'bg-white hover:bg-neutral-50 border-neutral-200/90 text-neutral-500 hover:text-neutral-900'
+                : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
             }`}
             title="Reset Timer [Alt+R]"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
+          {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`p-3.5 rounded-lg border transition-colors cursor-pointer ${
+            className={`p-2.5 rounded-xl border transition-colors cursor-pointer ${
               soundEnabled
                 ? isLight
-                  ? 'bg-slate-100 border-slate-300 text-slate-700'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:text-white'
-                : 'bg-red-500/10 border-red-500/30 text-red-500'
+                  ? 'bg-white hover:bg-neutral-50 border-neutral-200/90 text-neutral-600'
+                  : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300'
+                : 'bg-rose-500/10 border-rose-500/20 text-rose-500'
             }`}
             title={soundEnabled ? 'Mute Sounds' : 'Unmute Sounds'}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
         </div>
 
-        {/* Keyboard shortcut & Live tab indicator */}
-        <div className={`mt-4 text-[10px] font-mono text-center ${isLight ? 'text-slate-500' : 'text-neutral-500'}`}>
-          SHORTCUTS:{' '}
-          <span className={`px-1.5 py-0.5 rounded border ${isLight ? 'bg-slate-200 border-slate-300 text-slate-700' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
-            [SPACE]
-          </span>{' '}
-          TOGGLE &bull;{' '}
-          <span className={`px-1.5 py-0.5 rounded border ${isLight ? 'bg-slate-200 border-slate-300 text-slate-700' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
-            [ALT+S]
-          </span>{' '}
-          SKIP BREAK &bull;{' '}
-          <span className={`px-1.5 py-0.5 rounded border ${isLight ? 'bg-slate-200 border-slate-300 text-slate-700' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
-            [ALT+R]
-          </span>{' '}
-          RESET
+        {/* Shortcuts Caption */}
+        <div className={`mt-5 text-[11px] font-mono ${isLight ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <span className="font-semibold">[Space]</span> Toggle &bull;{' '}
+          <span className="font-semibold">[Alt+S]</span> Skip &bull;{' '}
+          <span className="font-semibold">[Alt+R]</span> Reset
         </div>
       </div>
     </div>

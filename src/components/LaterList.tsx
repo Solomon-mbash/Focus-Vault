@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFocusStore } from '@/store/useFocusStore';
-import { Lightbulb, Plus, Trash2, ShieldAlert, Lock } from 'lucide-react';
+import { Lightbulb, Plus, Trash2, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const LaterList: React.FC = () => {
@@ -18,31 +18,25 @@ export const LaterList: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-6 max-w-4xl mx-auto">
+    <div className="w-full space-y-5 max-w-3xl mx-auto">
       {/* Header */}
       <div
-        className={`p-6 rounded-xl border shadow-xl transition-colors ${
-          isLight ? 'bg-white border-slate-200 shadow-slate-200/50 text-slate-800' : 'bg-[#111111] border-neutral-800 text-white'
+        className={`p-5 md:p-6 rounded-2xl border transition-colors ${
+          isLight
+            ? 'bg-white border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] text-neutral-900'
+            : 'bg-[#101014] border-neutral-800/80 text-neutral-100 shadow-xl'
         }`}
       >
-        <div className={`text-xs font-mono uppercase tracking-widest ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
-          SHINY OBJECT PARKING LOT
+        <div className={`text-[11px] font-mono uppercase tracking-wider ${isLight ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          Parking Lot
         </div>
-        <h2 className="text-2xl font-black font-mono tracking-tight mt-0.5 flex items-center space-x-2.5">
-          <Lightbulb className="w-6 h-6 text-amber-500" />
-          <span>LATER LIST (DO NOT START NOW)</span>
+        <h2 className="text-xl font-bold tracking-tight mt-0.5 flex items-center space-x-2">
+          <Lightbulb className="w-5 h-5 text-amber-500" />
+          <span>Later List</span>
         </h2>
-        <p className={`text-xs font-mono mt-1 ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
-          Park shiny new ideas here immediately so you don't derail your active 1-Month Boss Fight project.
+        <p className={`text-xs mt-1 ${isLight ? 'text-neutral-500' : 'text-neutral-400'}`}>
+          Park shiny new ideas here immediately so they don't distract your current focus targets.
         </p>
-      </div>
-
-      {/* Warning callout */}
-      <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center space-x-3 text-amber-800 font-mono text-xs shadow-md">
-        <ShieldAlert className="w-5 h-5 shrink-0 text-amber-600" />
-        <div>
-          <span className="font-bold uppercase text-amber-700">DISCIPLINE RULE:</span> Any project not in your active 1-Month Boss Fight belongs in this vault. Do NOT touch them until the current project is shipped!
-        </div>
       </div>
 
       {/* Input Form */}
@@ -52,62 +46,65 @@ export const LaterList: React.FC = () => {
           placeholder="Dump shiny new idea here..."
           value={newIdea}
           onChange={(e) => setNewIdea(e.target.value)}
-          className={`flex-1 rounded-xl px-4 py-3 text-sm focus:outline-none font-sans border shadow-inner ${
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm focus:outline-none border transition-colors ${
             isLight
-              ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-amber-500'
-              : 'bg-neutral-950 border-neutral-800 text-white placeholder-neutral-600 focus:border-amber-500'
+              ? 'bg-white border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 shadow-xs'
+              : 'bg-[#101014] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600'
           }`}
         />
         <button
           type="submit"
-          className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-mono text-xs font-bold uppercase rounded-xl flex items-center space-x-2 transition-colors shrink-0 shadow-md cursor-pointer"
+          className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0 shadow-xs ${
+            isLight ? 'bg-neutral-900 hover:bg-neutral-800 text-white' : 'bg-white hover:bg-neutral-100 text-neutral-950'
+          }`}
         >
           <Plus className="w-4 h-4" />
-          <span>PARK IDEA</span>
+          <span>Park</span>
         </button>
       </form>
 
       {/* List */}
-      <div className="space-y-3">
-        <div className={`text-xs font-mono px-1 uppercase font-bold ${isLight ? 'text-slate-500' : 'text-neutral-400'}`}>
-          PARKED IDEAS ({laterIdeas.length})
+      <div className="space-y-2">
+        <div className={`text-xs font-mono uppercase px-1 font-semibold ${isLight ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          Parked Ideas ({laterIdeas.length})
         </div>
 
         {laterIdeas.length === 0 ? (
-          <div className={`p-12 text-center border border-dashed rounded-xl font-mono text-xs ${
-            isLight ? 'bg-white border-slate-300 text-slate-500' : 'bg-[#111111] border-neutral-800 text-neutral-500'
-          }`}>
+          <div
+            className={`p-10 text-center border rounded-2xl text-xs font-mono transition-colors ${
+              isLight ? 'bg-white border-neutral-200/80 text-neutral-400' : 'bg-[#101014] border-neutral-800/80 text-neutral-500'
+            }`}
+          >
             No parked ideas. Stay locked in on your current target!
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-1.5">
             <AnimatePresence>
               {laterIdeas.map((idea) => (
                 <motion.div
                   key={idea.id}
-                  initial={{ opacity: 0, y: 4 }}
+                  layout
+                  initial={{ opacity: 0, y: 3 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className={`p-4 rounded-xl border flex items-center justify-between gap-4 font-mono text-xs shadow-sm transition-all ${
+                  className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs transition-colors ${
                     isLight
-                      ? 'bg-white border-slate-200 hover:border-slate-300 text-slate-800'
-                      : 'bg-[#111111] border-neutral-800 hover:border-neutral-700 text-white'
+                      ? 'bg-white border-neutral-200/80 hover:border-neutral-300 text-neutral-800 shadow-xs'
+                      : 'bg-[#101014] border-neutral-800/80 hover:border-neutral-700 text-neutral-200'
                   }`}
                 >
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <Lock className="w-4 h-4 text-amber-500 shrink-0" />
-                    <span className={`font-sans text-sm truncate ${isLight ? 'text-slate-800' : 'text-neutral-200'}`}>
-                      {idea.text}
-                    </span>
+                  <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                    <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">{idea.text}</span>
                   </div>
                   <button
                     onClick={() => deleteLaterIdea(idea.id)}
-                    className={`p-1.5 rounded-lg transition-colors shrink-0 cursor-pointer ${
-                      isLight ? 'text-slate-400 hover:text-red-600 hover:bg-slate-100' : 'text-neutral-500 hover:text-red-400 hover:bg-neutral-800'
+                    className={`p-1 rounded-lg transition-colors shrink-0 cursor-pointer ${
+                      isLight ? 'text-neutral-400 hover:text-rose-600 hover:bg-neutral-100' : 'text-neutral-500 hover:text-rose-400 hover:bg-neutral-800'
                     }`}
-                    title="Delete Idea"
+                    title="Delete"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </motion.div>
               ))}

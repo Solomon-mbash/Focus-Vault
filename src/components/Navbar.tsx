@@ -5,7 +5,7 @@ import { useFocusStore, useStreakCount } from '@/store/useFocusStore';
 import { BackupModal } from '@/components/BackupModal';
 import {
   Flame,
-  LayoutDashboard,
+  CheckCircle2,
   TrendingUp,
   Lightbulb,
   RotateCcw,
@@ -31,185 +31,181 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header
-        className={`w-full sticky top-0 z-40 select-none transition-colors duration-300 ${
+        className={`w-full sticky top-0 z-40 select-none transition-colors duration-200 backdrop-blur-xl border-b ${
           isLight
-            ? 'bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm text-slate-800'
-            : 'bg-[#070707]/90 backdrop-blur-md border-b border-neutral-800/90 text-white'
+            ? 'bg-white/80 border-neutral-200/80 text-neutral-900 shadow-[0_1px_2px_rgba(0,0,0,0.03)]'
+            : 'bg-[#09090B]/85 border-neutral-800/80 text-neutral-100'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-15 flex items-center justify-between gap-4">
           {/* Brand */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('board')}>
+          <div
+            className="flex items-center space-x-2.5 cursor-pointer group"
+            onClick={() => setActiveTab('board')}
+          >
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all ${
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                 isLight
-                  ? 'bg-[#4946FF] border-[#3B38EC] shadow-[0_0_15px_rgba(73,70,255,0.4)]'
-                  : 'bg-red-600 border-red-500/80 shadow-[0_0_18px_rgba(239,68,68,0.5)]'
+                  ? 'bg-neutral-900 text-white shadow-sm group-hover:bg-[#4946FF]'
+                  : 'bg-white text-neutral-950 shadow-sm group-hover:bg-neutral-200'
               }`}
             >
-              <Shield className="w-5 h-5 text-white fill-white/20" />
+              <Shield className="w-4 h-4 fill-current/15 stroke-[2.2]" />
             </div>
-            <div>
-              <div className="text-base font-black font-mono tracking-wider leading-none">
-                FOCUS
-                <span className={isLight ? 'text-[#4946FF]' : 'text-red-500'}>VAULT</span>
+            <div className="flex flex-col">
+              <div className="text-sm font-bold tracking-tight leading-none flex items-center gap-1">
+                <span>FOCUS</span>
+                <span className={isLight ? 'text-[#4946FF]' : 'text-neutral-400'}>VAULT</span>
               </div>
-              <div className="text-[9px] font-mono text-neutral-400 tracking-widest mt-0.5 uppercase">
-                EXECUTION PRISON
-              </div>
+              <span className={`text-[10px] font-mono tracking-wider mt-0.5 uppercase ${isLight ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                EXECUTION SYSTEM
+              </span>
             </div>
           </div>
 
-          {/* Tab Navigation */}
+          {/* Segmented Tab Navigation */}
           <nav
-            className={`hidden md:flex items-center space-x-1.5 p-1.5 rounded-xl border font-mono text-xs shadow-inner transition-colors ${
+            className={`hidden md:flex items-center p-1 rounded-full border transition-colors ${
               isLight
-                ? 'bg-slate-100/90 border-slate-200'
-                : 'bg-[#111111] border-neutral-800/90'
+                ? 'bg-neutral-100/80 border-neutral-200/90 text-neutral-600'
+                : 'bg-neutral-900/80 border-neutral-800/90 text-neutral-400'
             }`}
           >
             <button
               onClick={() => setActiveTab('board')}
-              className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center space-x-1.5 ${
                 activeTab === 'board'
                   ? isLight
-                    ? 'bg-[#4946FF] text-white font-bold shadow-md shadow-[#4946FF]/30'
-                    : 'bg-neutral-800 text-white font-bold border border-neutral-700 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                  : isLight
-                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/60'
+                    ? 'bg-white text-neutral-900 shadow-sm font-semibold'
+                    : 'bg-neutral-800 text-white shadow-sm font-semibold'
+                  : 'hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <LayoutDashboard className={`w-3.5 h-3.5 ${isLight ? 'text-white' : 'text-red-500'}`} />
-              <span>EXECUTION BOARD</span>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Execution</span>
             </button>
 
             <button
               onClick={() => setActiveTab('journal')}
-              className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center space-x-1.5 ${
                 activeTab === 'journal'
                   ? isLight
-                    ? 'bg-[#4946FF] text-white font-bold shadow-md shadow-[#4946FF]/30'
-                    : 'bg-neutral-800 text-white font-bold border border-neutral-700 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                  : isLight
-                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/60'
+                    ? 'bg-white text-neutral-900 shadow-sm font-semibold'
+                    : 'bg-neutral-800 text-white shadow-sm font-semibold'
+                  : 'hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <TrendingUp className={`w-3.5 h-3.5 ${isLight ? 'text-white' : 'text-emerald-400'}`} />
-              <span>TRADE JOURNAL</span>
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Trades</span>
             </button>
 
             <button
               onClick={() => setActiveTab('later')}
-              className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center space-x-1.5 ${
                 activeTab === 'later'
                   ? isLight
-                    ? 'bg-[#4946FF] text-white font-bold shadow-md shadow-[#4946FF]/30'
-                    : 'bg-neutral-800 text-white font-bold border border-neutral-700 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                  : isLight
-                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/60'
+                    ? 'bg-white text-neutral-900 shadow-sm font-semibold'
+                    : 'bg-neutral-800 text-white shadow-sm font-semibold'
+                  : 'hover:text-neutral-900 dark:hover:text-white'
               }`}
             >
-              <Lightbulb className={`w-3.5 h-3.5 ${isLight ? 'text-white' : 'text-amber-300'}`} />
-              <span>LATER LIST</span>
+              <Lightbulb className="w-3.5 h-3.5" />
+              <span>Later</span>
             </button>
           </nav>
 
           {/* Right side stats & actions */}
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-2">
             {/* Streak Counter */}
             <div
-              className={`flex items-center space-x-2 border px-3.5 py-1.5 rounded-lg text-xs font-mono shadow-inner ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-mono border transition-colors ${
                 isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-700'
-                  : 'bg-[#111111] border-neutral-800 text-neutral-300'
+                  ? 'bg-neutral-50 border-neutral-200/80 text-neutral-700'
+                  : 'bg-neutral-900/90 border-neutral-800 text-neutral-300'
               }`}
             >
-              <Flame className={`w-4 h-4 animate-pulse ${isLight ? 'text-[#4946FF] fill-[#4946FF]/20' : 'text-red-500 fill-red-500/20'}`} />
-              <span className={`font-bold ${isLight ? 'text-[#4946FF]' : 'text-red-400'}`}>{streak}D STREAK</span>
+              <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+              <span className="font-semibold">{streak}d streak</span>
             </div>
 
             {/* Light / Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              title={isLight ? 'Switch to Obsidian Dark Mode' : 'Switch to Electric Light Mode'}
-              className={`p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
+              title={isLight ? 'Switch to Dark mode' : 'Switch to Light mode'}
+              className={`p-2 rounded-lg border transition-all cursor-pointer ${
                 isLight
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-[#4946FF]'
-                  : 'bg-[#111111] hover:bg-neutral-800 border-neutral-800 text-amber-400'
+                  ? 'bg-neutral-50 hover:bg-neutral-100 border-neutral-200 text-neutral-700'
+                  : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300'
               }`}
             >
-              {isLight ? <Moon className="w-4 h-4 fill-[#4946FF]/20" /> : <Sun className="w-4 h-4 fill-amber-400/20" />}
+              {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
             </button>
 
             {/* Database Modal Trigger */}
             <button
               onClick={() => setIsBackupOpen(true)}
-              title="Database & Backup Options"
-              className={`px-3 py-1.5 border rounded-lg transition-colors cursor-pointer flex items-center space-x-1.5 text-xs font-mono font-bold ${
+              title="Database & Backup"
+              className={`p-2 rounded-lg border transition-all cursor-pointer ${
                 isLight
-                  ? 'bg-[#4946FF]/10 hover:bg-[#4946FF]/20 border-[#4946FF]/30 text-[#4946FF]'
-                  : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-emerald-400 hover:text-emerald-300'
+                  ? 'bg-neutral-50 hover:bg-neutral-100 border-neutral-200 text-neutral-700'
+                  : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300'
               }`}
             >
-              <Database className={`w-3.5 h-3.5 ${isLight ? 'text-[#4946FF]' : 'text-emerald-400'}`} />
-              <span className="hidden sm:inline">DATABASE</span>
+              <Database className="w-4 h-4" />
             </button>
 
             <button
               onClick={handleResetData}
-              title="Reset All Local Data"
-              className={`p-2.5 rounded-lg border transition-colors cursor-pointer ${
+              title="Reset All Data"
+              className={`p-2 rounded-lg border transition-all cursor-pointer ${
                 isLight
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-600'
-                  : 'bg-[#111111] hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
+                  ? 'bg-neutral-50 hover:bg-neutral-100 border-neutral-200 text-neutral-400 hover:text-red-600'
+                  : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-500 hover:text-red-400'
               }`}
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         <div
-          className={`flex md:hidden border-t font-mono text-[10px] overflow-x-auto ${
-            isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0A0A0A] border-neutral-800/80'
+          className={`flex md:hidden border-t font-mono text-[11px] ${
+            isLight ? 'bg-neutral-50 border-neutral-200' : 'bg-[#09090B] border-neutral-800'
           }`}
         >
           <button
             onClick={() => setActiveTab('board')}
-            className={`flex-1 py-2.5 px-2 text-center whitespace-nowrap border-b-2 cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 text-center transition-colors cursor-pointer ${
               activeTab === 'board'
                 ? isLight
-                  ? 'border-[#4946FF] text-[#4946FF] font-bold bg-white'
-                  : 'border-red-500 text-white font-bold bg-[#111111]'
-                : 'border-transparent text-neutral-400'
+                  ? 'text-neutral-900 font-bold bg-white'
+                  : 'text-white font-bold bg-neutral-900'
+                : 'text-neutral-400'
             }`}
           >
-            BOARD
+            EXECUTION
           </button>
           <button
             onClick={() => setActiveTab('journal')}
-            className={`flex-1 py-2.5 px-2 text-center whitespace-nowrap border-b-2 cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 text-center transition-colors cursor-pointer ${
               activeTab === 'journal'
                 ? isLight
-                  ? 'border-[#4946FF] text-[#4946FF] font-bold bg-white'
-                  : 'border-emerald-500 text-white font-bold bg-[#111111]'
-                : 'border-transparent text-neutral-400'
+                  ? 'text-neutral-900 font-bold bg-white'
+                  : 'text-white font-bold bg-neutral-900'
+                : 'text-neutral-400'
             }`}
           >
             TRADES
           </button>
           <button
             onClick={() => setActiveTab('later')}
-            className={`flex-1 py-2.5 px-2 text-center whitespace-nowrap border-b-2 cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 text-center transition-colors cursor-pointer ${
               activeTab === 'later'
                 ? isLight
-                  ? 'border-[#4946FF] text-[#4946FF] font-bold bg-white'
-                  : 'border-amber-300 text-white font-bold bg-[#111111]'
-                : 'border-transparent text-neutral-400'
+                  ? 'text-neutral-900 font-bold bg-white'
+                  : 'text-white font-bold bg-neutral-900'
+                : 'text-neutral-400'
             }`}
           >
             LATER
